@@ -1,6 +1,6 @@
-package com.kakapo.unity.message.server;
+package com.kakapo.unity.message;
 
-import com.kakapo.unity.client.Status;
+import com.kakapo.unity.server.Status;
 import com.kakapo.unity.util.Objects;
 import java.util.Date;
 
@@ -37,6 +37,7 @@ public class ExtensionStatus
     return this.since;
   }
 
+    @Override
   public String toString()
   {
     return Objects.toString(this);

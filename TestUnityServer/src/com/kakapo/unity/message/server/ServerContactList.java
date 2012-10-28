@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.kakapo.unity.message.redundantserver;
+package com.kakapo.unity.message.server;
 
-import com.kakapo.unity.message.server.ContactAction;
-import com.kakapo.unity.message.server.SingleItemSet;
+import com.kakapo.unity.message.ContactAction;
+import com.kakapo.unity.message.SingleItemSet;
 import java.util.Collection;
 
 /**

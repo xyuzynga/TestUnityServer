@@ -1,7 +1,8 @@
-package com.kakapo.unity.message.server;
+package com.kakapo.unity.message.client;
 
+import com.kakapo.unity.message.ExtensionStatus;
 import com.kakapo.unity.message.Message;
-import com.kakapo.unity.client.Status;
+import com.kakapo.unity.server.Status;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

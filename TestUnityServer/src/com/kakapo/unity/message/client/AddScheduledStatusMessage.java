@@ -1,6 +1,6 @@
 package com.kakapo.unity.message.client;
 
-import com.kakapo.unity.client.ScheduledStatus;
+import com.kakapo.unity.server.ScheduledStatus;
 import java.util.Date;
 
 public class AddScheduledStatusMessage extends ClientMessage

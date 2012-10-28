@@ -1,4 +1,4 @@
-package com.kakapo.unity.client;
+package com.kakapo.unity.server;
 
 import com.kakapo.unity.util.Objects;
 import java.util.Date;

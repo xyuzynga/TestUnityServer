@@ -1,4 +1,4 @@
-package com.kakapo.unity.message.server;
+package com.kakapo.unity.message;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

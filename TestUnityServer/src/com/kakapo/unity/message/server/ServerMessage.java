@@ -1,4 +1,4 @@
-package com.kakapo.unity.message.redundantserver;
+package com.kakapo.unity.message.server;
 
 import com.kakapo.unity.message.Message;
 

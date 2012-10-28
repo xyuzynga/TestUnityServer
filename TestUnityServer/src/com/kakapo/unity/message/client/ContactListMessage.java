@@ -1,6 +1,9 @@
-package com.kakapo.unity.message.server;
+package com.kakapo.unity.message.client;
 
+import com.kakapo.unity.message.SingleItemSet;
+import com.kakapo.unity.message.ContactAction;
 import com.kakapo.unity.message.Message;
+import com.kakapo.unity.message.server.*;
 import java.util.Collection;
 
 public class ContactListMessage extends Message

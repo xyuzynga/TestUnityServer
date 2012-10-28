@@ -1,6 +1,6 @@
 package com.kakapo.unity.message.client;
 
-import com.kakapo.unity.message.server.SingleItemSet;
+import com.kakapo.unity.message.SingleItemSet;
 import java.util.Set;
 
 public class TextMessage extends PeerMessage {
@@ -23,6 +23,7 @@ public class TextMessage extends PeerMessage {
         return this._text;
     }
 
+    @Override
     public String toString() {
         return super.toString() + " \"" + this._text + "\"";
     }

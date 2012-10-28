@@ -1,10 +1,10 @@
-package com.kakapo.unity.client;
+package com.kakapo.unity.server;
 
 /**
  *
  * @author felix.vincent
  */
-public class TestClient {
+public class Main {
 
     /**
      * @param args the command line arguments

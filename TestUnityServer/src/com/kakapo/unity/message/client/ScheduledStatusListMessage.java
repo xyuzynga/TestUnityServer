@@ -1,7 +1,7 @@
-package com.kakapo.unity.message.server;
+package com.kakapo.unity.message.client;
 
+import com.kakapo.unity.server.ScheduledStatus;
 import com.kakapo.unity.message.Message;
-import com.kakapo.unity.client.ScheduledStatus;
 import java.util.Collection;
 
 public class ScheduledStatusListMessage extends Message

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.kakapo.unity.message.redundantserver;
+package com.kakapo.unity.message.server;
 
 /**
  * this class represents the messages sent from a foreign server to the unity server to register itself
