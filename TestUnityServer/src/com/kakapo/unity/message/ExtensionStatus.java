@@ -1,6 +1,5 @@
 package com.kakapo.unity.message;
 
-import com.kakapo.unity.server.Status;
 import com.kakapo.unity.util.Objects;
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package com.kakapo.unity.server;
+package com.kakapo.unity.message;
 
 import java.util.Date;
 

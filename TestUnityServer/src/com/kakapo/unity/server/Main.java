@@ -10,62 +10,23 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        // TODO-GK Server startup & code associated with Netty
     }
 
-    private void processClientCommandMessage(String clientCommandMessage) {
-        String current = clientCommandMessage;
-        ClientCommandMessage currentClientCommandMessage = ClientCommandMessage.valueOf(current);
-
-        switch (currentClientCommandMessage) {
-            case Register:
-                break;
-            case KeepAlive:
-                break;
-            case Message:
-                break;
-            case SetStatus:
-                break;
-            case AddScheduledStatus:
-                break;
-            case ClearStatus:
-                break;
-            case ListScheduledStatuses:
-                break;
-            case Register2:
-                break;
-            case Message2:
-                break;
-            default:
-                throw new AssertionError();
-        }
+    private void processScheduledStatuses() {
+        
+        /*TODO-Prijo CODE for processing scheduled statuses*/
+        
     }
-
-    private void processSeverCommandMessage(String severCommandMessage) {
-        String current = severCommandMessage;
-        ServerCommandMessage currentSeverCommandMessage = ServerCommandMessage.valueOf(current);
-
-        switch (currentSeverCommandMessage) {
-            case KeepAlive:
-                break;
-            case ServerRegister:
-                break;
-            case ServerContactList:
-                break;
-            case ServerMessage:
-                break;
-            case ServerStatusList:
-                break;
-            case ServerSetStatus:
-                break;
-            default:
-                throw new AssertionError();
-        }
-
+    
+    private void processDisconnection() {
+        
+        /*TODO-Abin CODE for processing disconnection events (Server & Client)*/
+        
     }
 
     /**
-     *All the Server to Server messages
+     * All the Server to Server messages
      */
     public static enum ServerCommandMessage {
 
@@ -96,7 +57,7 @@ public class Main {
     }
 
     /**
-     *All the Client to Server messages
+     * All the Client to Server messages
      */
     public static enum ClientCommandMessage {
 
@@ -110,6 +71,11 @@ public class Main {
         //Used to keep the TCP connection active, should be ignored by the server
 
         Message,
+        //From client to server
+        //From server to client
+        //Send an instant message to one or more users
+
+        Custom,
         //From client to server
         //From server to client
         //Send an instant message to one or more users
@@ -135,15 +101,15 @@ public class Main {
         //Used by clients using the new command set to register on the server
 
         Message2;
-//From client to server
-//From server to client
-//Used by clients using the new command
-//set to send instant messages, which are
-//then relayed through all servers.
+        //From client to server
+        //From server to client
+        //Used by clients using the new command
+        //set to send instant messages, which are
+        //then relayed through all servers.
     }
 
     /**
-     *All the Server to Client messages
+     * All the Server to Client messages
      */
     public static enum ServerResponseMessage {
 
