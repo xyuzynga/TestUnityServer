@@ -5,6 +5,8 @@ import com.kakapo.unity.server.ServerMain;
 
 public class ServerConnection implements com.kakapo.unity.server.connection.Connection{
 
+    private final String serverName = "";
+            
     @Override
     public void receive(Message paramMessage) {
         

@@ -4,7 +4,11 @@ import com.kakapo.unity.message.Message;
 import com.kakapo.unity.server.ServerMain.ClientCommandMessage;
 
 public class ClientConnection implements Connection{
-
+    
+     private final String loginId = "";
+     private final String groupName = "";
+     private final String productName = "";
+     
     @Override
     public void receive(Message paramMessage) {
         

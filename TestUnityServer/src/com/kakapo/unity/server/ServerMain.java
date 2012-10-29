@@ -1,10 +1,11 @@
 package com.kakapo.unity.server;
 
-import com.kakapo.unity.message.kempcodec.WrapperKempCodec;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFactory;
@@ -27,7 +28,11 @@ public class ServerMain {
 
     public static ConcurrentHashMap<String, Integer> connectedChannel_channelIDMap = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, DefaultChannelGroup> groups = new ConcurrentHashMap<>();
-
+    
+    public static AtomicInteger totalMessagesReceived = new AtomicInteger(0);
+    public static AtomicInteger totalConnections = new AtomicInteger(0);
+    private static Logger logger ;
+        
     public static void main(String[] args) {
 
         // TODO-GK Server startup & code associated with Netty

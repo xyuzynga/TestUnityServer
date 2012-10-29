@@ -26,4 +26,10 @@ public class ContactListMessage extends Message
   {
     return this._actions;
   }
+
+    @Override
+    public String toString() {
+        return "Command: ContactList\nAdd-Contact: 442082881251@drd.co.uk\n\n";    }
+  
+  
 }

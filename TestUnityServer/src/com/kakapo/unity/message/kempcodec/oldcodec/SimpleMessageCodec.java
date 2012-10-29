@@ -39,12 +39,12 @@ public class SimpleMessageCodec
 
     private static final Logger logger;
     private static final String DEFAULT_STATUS = "none";
-    private final ResourceBundle _messages;
+   // private final ResourceBundle _messages;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss");
     private static final Pattern BLANK_LINE_PATTERN;
 
     public SimpleMessageCodec() {
-        this._messages = ResourceBundle.getBundle("messages");
+     //   this._messages = ResourceBundle.getBundle("messages");
         this.dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
@@ -57,6 +57,7 @@ public class SimpleMessageCodec
     }
 
     @SuppressWarnings("empty-statement")
+    @Override
     public synchronized MessageCodec.DecodeResult decode(CharSequence encoded) {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine(encoded.toString());
@@ -217,57 +218,7 @@ public class SimpleMessageCodec
         return null;
     }
 
-    private boolean checkMessageEnd(LineReader lines) {
-        if (lines.hasNext()) {
-            CharSequence line = lines.next();
-            if (line.length() > 0) {
-                throw new IllegalStateException(new StringBuilder().append("Found extra line at end of message: ").append(line.toString()).toString());
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    private CharSequence readFreeText(LineReader lines, CharSequence input) {
-        Property property = new Property(lines.next());
-        if ((property.name == null) || (!"Length".contentEquals(property.name))) {
-            throw new IllegalStateException("Expected Length");
-        }
-
-        int length = Integer.parseInt(property.value.toString());
-        CharSequence sequence = input.subSequence(lines.position(), lines.position() + length);
-
-        lines.position(lines.position() + length);
-
-        lines.next();
-
-        return sequence;
-    }
-
-    private Set<String> readExtensions(LineReader lines) {
-        Property property = new Property(lines.next());
-        assert ("Extensions".contentEquals(property.name));
-        Set<String> extensions = new HashSet<String>();
-        StringTokenizer tokenizer = new StringTokenizer(property.value.toString(), " ,");
-        while (tokenizer.hasMoreTokens()) {
-            extensions.add(tokenizer.nextToken());
-        }
-        return extensions;
-    }
-
-    private void appendProperty(CharSequence name, CharSequence value, Appendable output) {
-        assert (!value.toString().contains("\n"));
-        try {
-            output.append(name);
-            output.append(": ");
-            output.append(value);
-            output.append('\n');
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    @Override
     public synchronized void encode(Message message, Appendable original) {
         Appendable output = original;
         if (logger.isLoggable(Level.FINE)) {
@@ -381,6 +332,58 @@ public class SimpleMessageCodec
         }
     }
 
+    private boolean checkMessageEnd(LineReader lines) {
+        if (lines.hasNext()) {
+            CharSequence line = lines.next();
+            if (line.length() > 0) {
+                throw new IllegalStateException(new StringBuilder().append("Found extra line at end of message: ").append(line.toString()).toString());
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private CharSequence readFreeText(LineReader lines, CharSequence input) {
+        Property property = new Property(lines.next());
+        if ((property.name == null) || (!"Length".contentEquals(property.name))) {
+            throw new IllegalStateException("Expected Length");
+        }
+
+        int length = Integer.parseInt(property.value.toString());
+        CharSequence sequence = input.subSequence(lines.position(), lines.position() + length);
+
+        lines.position(lines.position() + length);
+
+        lines.next();
+
+        return sequence;
+    }
+
+    private Set<String> readExtensions(LineReader lines) {
+        Property property = new Property(lines.next());
+        assert ("Extensions".contentEquals(property.name));
+        Set<String> extensions = new HashSet<String>();
+        StringTokenizer tokenizer = new StringTokenizer(property.value.toString(), " ,");
+        while (tokenizer.hasMoreTokens()) {
+            extensions.add(tokenizer.nextToken());
+        }
+        return extensions;
+    }
+
+    private void appendProperty(CharSequence name, CharSequence value, Appendable output) {
+        assert (!value.toString().contains("\n"));
+        try {
+            output.append(name);
+            output.append(": ");
+            output.append(value);
+            output.append('\n');
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    
     private void appendFreeText(CharSequence text, Appendable output) {
         try {
             appendProperty("Length", Integer.toString(text.length()), output);

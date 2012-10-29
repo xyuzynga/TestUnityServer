@@ -1,11 +1,15 @@
 package com.kakapo.unity.server;
 
+import com.kakapo.unity.message.ContactAction;
 import com.kakapo.unity.message.KeepAliveMessage;
 import com.kakapo.unity.message.Message;
 import com.kakapo.unity.message.client.ClientMessage;
+import com.kakapo.unity.message.client.ContactListMessage;
+import com.kakapo.unity.message.client.StatusListMessage;
 import com.kakapo.unity.message.server.ServerMessage;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.handler.timeout.IdleState;
@@ -14,34 +18,46 @@ import org.jboss.netty.handler.timeout.IdleStateEvent;
 
 public class Handler extends IdleStateAwareChannelHandler {
 
-    private static final int messagesReceived = 0;
     static DefaultChannelGroup group = new DefaultChannelGroup();
-    static int i = 0;
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        ServerMain.totalMessagesReceived.incrementAndGet();
         Message m = (Message) e.getMessage();
 
         if (m instanceof ClientMessage) {
+            System.out.println("\nClient message --> \n " + m);
             processClientMessage(m, ctx);
         } else if (m instanceof ServerMessage) {
+            System.out.println("\nServer message --> \n " + m);
             processServerMessage(m, ctx);
         }
-
-        System.out.println(m);
+        
         group.write(m);
     }
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-//        i++;
-//        
+       ServerMain.totalConnections.incrementAndGet();
+        if (ServerMain.totalConnections.intValue()%100 == 0) {
+            System.out.println("Crossed another century connections" + ServerMain.totalConnections.intValue());
+        }
+        
 //        if (i % 2 == 0) {
 //            ctx.getChannel().getPipeline().remove("messageEncoder");
 //            ctx.getChannel().getPipeline().addAfter("StringEncoder", "msgEncdr", new MsgEncdr());
 //        }
-//        group.add(e.getChannel());
+        
+        group.add(e.getChannel());
+        
     }
+
+    @Override
+    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        super.channelClosed(ctx, e);
+        ServerMain.totalConnections.decrementAndGet();
+    }
+    
 
     @Override
     public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) throws Exception {
@@ -64,6 +80,11 @@ public class Handler extends IdleStateAwareChannelHandler {
                 //check if group exists in hashmap ServerMain.groups if not create a new channelGroup 
                 //and add it to the hashmap with name of the group as key,then add the channel to the corresponding groups channelgroup.
                 //channel.write(contactlist),channel.write(statuslist),channelgroup.write(contactlist),channelgroup.write(statuslist)
+                
+                ctx.getChannel().write(new ContactListMessage(new ContactAction(ContactAction.Action.ADD, "felix@drd.co.uk")));
+                
+                ctx.getChannel().write(new StatusListMessage());
+                
                 break;
             case KeepAlive:
 
@@ -115,7 +136,13 @@ public class Handler extends IdleStateAwareChannelHandler {
         }
     }
 
-    public void processServerMessage(Message severCommandMessage, ChannelHandlerContext ctx) {
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        super.exceptionCaught(ctx, e);
+        System.out.println(e.getCause());
+    }
+
+    private void processServerMessage(Message severCommandMessage, ChannelHandlerContext ctx) {
         String current = severCommandMessage.getCommand();
         ServerMain.ServerCommandMessage currentSeverCommandMessage = ServerMain.ServerCommandMessage.valueOf(current);
 
@@ -155,4 +182,6 @@ public class Handler extends IdleStateAwareChannelHandler {
         }
 
     }
+
+    
 }

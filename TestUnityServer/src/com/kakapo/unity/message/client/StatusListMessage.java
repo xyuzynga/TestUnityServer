@@ -31,4 +31,9 @@ public class StatusListMessage extends Message
   {
     return this.statuses;
   }
+  
+   @Override
+    public String toString() {
+        return "Command: StatusList\n\n";
+    }
 }

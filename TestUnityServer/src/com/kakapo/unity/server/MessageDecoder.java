@@ -25,4 +25,5 @@ public class MessageDecoder extends OneToOneDecoder {
         CharSequence ch = (CharSequence) o;
         return WrapperKempCodec.getInstance().decode(ch);
     }
+    
 }    

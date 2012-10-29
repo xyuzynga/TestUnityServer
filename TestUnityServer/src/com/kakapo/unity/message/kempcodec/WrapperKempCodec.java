@@ -23,7 +23,9 @@ public class WrapperKempCodec {
     public Message decode(CharSequence kempEncodedCharSeq) throws Exception {
         CharSequence s = (CharSequence) kempEncodedCharSeq;
         SimpleMessageCodec.DecodeResult dr;
-        dr = simpleMessageCodec.decode(s);
+        dr = simpleMessageCodec.decode(s+"\n\n");
         return dr.message;
     }
+    
+    
 }
