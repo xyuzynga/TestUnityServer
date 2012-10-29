@@ -1,51 +1,42 @@
 package com.kakapo.unity.server;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import com.kakapo.unity.message.KeepAliveMessage;
+import com.kakapo.unity.message.Message;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
+import org.jboss.netty.handler.timeout.IdleState;
+import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
+import org.jboss.netty.handler.timeout.IdleStateEvent;
 
-public class Handler {
+public class Handler extends IdleStateAwareChannelHandler {
 
     private static final int messagesReceived = 0;
-    private static final SocketChannel channelConnected = null;
-    private boolean isDisconnected = true;
+    static DefaultChannelGroup group = new DefaultChannelGroup();
+    static int i = 0;
 
-    public Handler() {
-        /*TODO-GK Consturctor of Handler*/
+    @Override
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        Message m = (Message) e.getMessage();
+        System.out.println(m);
+        group.write(m);
     }
 
-    private ByteBuffer read() {
-        /*TODO-GK Handle read event*/
-        return null;
-    }
-    
-    private void write(ByteBuffer bb) {
-        /*TODO-GK Handle write event */
-    }
-
-    /**
-     * Get the value of messagesReceived
-     *
-     * @return the value of messagesReceived
-     */
-    public static int getMessagesReceived() {
-        return messagesReceived;
+    @Override
+    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        i++;
+        if (i % 2 == 0) {
+            ctx.getChannel().getPipeline().remove("messageencoder");
+            ctx.getChannel().getPipeline().addAfter("Stringencoder", "mmencoder", new mencoder1());
+        }
+        group.add(e.getChannel());
     }
 
-    /**
-     * Get the value of channelConnected
-     *
-     * @return the value of channelConnected
-     */
-    public static SocketChannel getChannelConnected() {
-        return channelConnected;
-    }
-
-    /**
-     * Get the value of isDisconnected
-     *
-     * @return the value of isDisconnected
-     */
-    public boolean isIsDisconnected() {
-        return isDisconnected;
+    @Override
+    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) throws Exception {
+        if (e.getState() == IdleState.WRITER_IDLE) {
+            e.getChannel().write(new KeepAliveMessage());
+        }
     }
 }
