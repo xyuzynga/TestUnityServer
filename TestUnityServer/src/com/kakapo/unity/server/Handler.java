@@ -14,31 +14,18 @@ import org.jboss.netty.handler.timeout.IdleStateEvent;
 
 public class Handler extends IdleStateAwareChannelHandler {
 
-    private static Handler uniqueInstance;
-// other useful instance variables here
     private static final int messagesReceived = 0;
     static DefaultChannelGroup group = new DefaultChannelGroup();
     static int i = 0;
-
-    private Handler() {
-    }
-
-    public static Handler getInstance() {
-        if (uniqueInstance == null) {
-            uniqueInstance = new Handler();
-        }
-        return uniqueInstance;
-    }
-// other useful methods here
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         Message m = (Message) e.getMessage();
 
         if (m instanceof ClientMessage) {
-            processClientMessage(m);
+            processClientMessage(m, ctx);
         } else if (m instanceof ServerMessage) {
-            processServerMessage(m);
+            processServerMessage(m, ctx);
         }
 
         System.out.println(m);
@@ -47,12 +34,13 @@ public class Handler extends IdleStateAwareChannelHandler {
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        i++;
-        if (i % 2 == 0) {
-            ctx.getChannel().getPipeline().remove("messageEncoder");
-            ctx.getChannel().getPipeline().addAfter("StringEncoder", "msgEncdr", new MsgEncdr());
-        }
-        group.add(e.getChannel());
+//        i++;
+//        
+//        if (i % 2 == 0) {
+//            ctx.getChannel().getPipeline().remove("messageEncoder");
+//            ctx.getChannel().getPipeline().addAfter("StringEncoder", "msgEncdr", new MsgEncdr());
+//        }
+//        group.add(e.getChannel());
     }
 
     @Override
@@ -62,15 +50,20 @@ public class Handler extends IdleStateAwareChannelHandler {
         }
     }
 
-    private void processClientMessage(Message clientCommandMessage) {
+    private void processClientMessage(Message clientCommandMessage, ChannelHandlerContext ctx) {
         String current = clientCommandMessage.getCommand();
-        Main.ClientCommandMessage currentClientCommandMessage = Main.ClientCommandMessage.valueOf(current);
+        ServerMain.ClientCommandMessage currentClientCommandMessage = ServerMain.ClientCommandMessage.valueOf(current);
 
         switch (currentClientCommandMessage) {
             case Register:
 
                 /*TODO-GK Process Register message */
 
+                //put the login id and channel id into the hashmap ServerMain.connectedChannel_channelIDMap
+
+                //check if group exists in hashmap ServerMain.groups if not create a new channelGroup 
+                //and add it to the hashmap with name of the group as key,then add the channel to the corresponding groups channelgroup.
+                //channel.write(contactlist),channel.write(statuslist),channelgroup.write(contactlist),channelgroup.write(statuslist)
                 break;
             case KeepAlive:
 
@@ -122,9 +115,9 @@ public class Handler extends IdleStateAwareChannelHandler {
         }
     }
 
-    public void processServerMessage(Message severCommandMessage) {
+    public void processServerMessage(Message severCommandMessage, ChannelHandlerContext ctx) {
         String current = severCommandMessage.getCommand();
-        Main.ServerCommandMessage currentSeverCommandMessage = Main.ServerCommandMessage.valueOf(current);
+        ServerMain.ServerCommandMessage currentSeverCommandMessage = ServerMain.ServerCommandMessage.valueOf(current);
 
         switch (currentSeverCommandMessage) {
             case KeepAlive:

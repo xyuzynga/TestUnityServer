@@ -1,7 +1,7 @@
 package com.kakapo.unity.server.connection;
 
 import com.kakapo.unity.message.Message;
-import com.kakapo.unity.server.Main;
+import com.kakapo.unity.server.ServerMain;
 
 public class ServerConnection implements com.kakapo.unity.server.connection.Connection{
 
@@ -17,7 +17,7 @@ public class ServerConnection implements com.kakapo.unity.server.connection.Conn
     @Override
     public void processMessage(Message severCommandMessage) {
         String current = severCommandMessage.getCommand();
-        Main.ServerCommandMessage currentSeverCommandMessage = Main.ServerCommandMessage.valueOf(current);
+        ServerMain.ServerCommandMessage currentSeverCommandMessage = ServerMain.ServerCommandMessage.valueOf(current);
 
         switch (currentSeverCommandMessage) {
             case KeepAlive:

@@ -1,7 +1,7 @@
 package com.kakapo.unity.server.connection;
 
 import com.kakapo.unity.message.Message;
-import com.kakapo.unity.server.Main.ClientCommandMessage;
+import com.kakapo.unity.server.ServerMain.ClientCommandMessage;
 
 public class ClientConnection implements Connection{
 

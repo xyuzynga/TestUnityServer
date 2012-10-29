@@ -13,12 +13,25 @@ import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
  *
  * @author felix.vincent
  */
-public class mencoder1 extends OneToOneEncoder{
+public class MessageEncoder extends OneToOneEncoder {
 
-    @Override
-    protected Object encode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
-       Message m=(Message) o;
-       return 2+m.toString();
+    private static MessageEncoder uniqueInstance;
+    // other useful instance variables here
+    
+    private MessageEncoder() {
+    }
+
+    public static MessageEncoder getInstance() {
+        if (uniqueInstance == null) {
+            uniqueInstance = new MessageEncoder();
+        }
+        return uniqueInstance;
     }
     
+    // other useful methods here
+    @Override
+    protected Object encode(ChannelHandlerContext chc, Channel chnl, Object o) throws Exception {
+        Message m = (Message) o;
+        return m.toString();
+    }
 }
