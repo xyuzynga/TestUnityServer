@@ -1,0 +1,9 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='Register'>
+    <Extn>${extn}</Extn>
+    <Dept>${dept}</Dept>
+    <Site>${site}</Site>
+    <Group>${group}</Group>
+    <Override>True</Override>
+  </Body>
+</KakapoDocument>

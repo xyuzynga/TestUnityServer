@@ -1,0 +1,9 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Contact Type='Group'>${group}</Contact>
+  <Body Command='Custom'>
+    <CustomCommand name='${name}'>
+      <Extn>${extn}</Extn>
+      <Status>${status}</Status>
+    </CustomCommand>
+  </Body>
+</KakapoDocument>

@@ -1,0 +1,3 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='KeepAlive' />
+</KakapoDocument>

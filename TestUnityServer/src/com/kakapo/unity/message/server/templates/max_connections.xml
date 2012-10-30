@@ -1,0 +1,8 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='Error'>
+    <RequestCommand>Register</RequestCommand>
+    <Number>3</Number>
+    <Description> The Unity Server has reached its maximum connection count and there is no redirect server.  Login refused </Description>
+    <AlertUser>True</AlertUser>
+  </Body>
+</KakapoDocument>

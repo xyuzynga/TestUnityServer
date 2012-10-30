@@ -1,0 +1,7 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='Error'>
+    <Number>8</Number>
+    <Description> The server is about to shutdown and no redirect server has been provided.  IM functionality will be lost</Description>
+    <AlertUser>True</AlertUser>
+  </Body>
+</KakapoDocument>

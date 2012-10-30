@@ -1,0 +1,8 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='Error'>
+    <Number>7</Number>
+    <Description> The server is about to shutdown.  Redirect to the included host</Description>
+    <AlertUser>False</AlertUser>
+    <RedirectHostName>${host}</RedirectHostName>
+  </Body>
+</KakapoDocument>

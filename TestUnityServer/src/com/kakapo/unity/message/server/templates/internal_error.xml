@@ -1,0 +1,7 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='Error'>
+    <Number>1</Number>
+    <Description>The Unity server has experienced an internal error and the request operation could not be performed </Description>
+    <AlertUser>True</AlertUser>
+  </Body>
+</KakapoDocument>

@@ -1,0 +1,13 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Contact Type='Extn'>${extn}</Contact>
+  <Contact Type='Dept'>${dept}</Contact>
+  <Contact Type='Site'>${site}</Contact>
+  <Contact Type='Group'>${group}</Contact>
+  <Body Command='Message'>
+    <Id>${id}</Id>
+    <Originator>${orginator}</Originator>
+    <Sender>${sender}</Sender>
+    <ShareResponse>True</ShareResponse>
+    <Text>This is a test</Text>
+  </Body>
+</KakapoDocument>

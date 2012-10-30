@@ -1,0 +1,9 @@
+<KakapoDocument Protocol='KEMP' Version='1.0'>
+  <Body Command='Error'>
+    <RequestCommand>Register</RequestCommand>
+    <Number>2</Number>
+    <Description>The Unity Server has reached its maximum connection count.  Redirect to the included host.</Description>
+    <AlertUser>False</AlertUser>
+    <RedirectHostName>${host}</RedirectHostName>
+  </Body>
+</KakapoDocument>
