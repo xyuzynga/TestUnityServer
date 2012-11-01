@@ -1,8 +1,0 @@
-<KakapoDocument Protocol='KEMP' Version='1.0'>
-  <Body Command='Error'>
-    <RequestCommand>Register</RequestCommand>
-    <Number>6</Number>
-    <Description> This registration is being terminated as it has been overridden by a new connection </Description>
-    <AlertUser>True</AlertUser>
-  </Body>
-</KakapoDocument>

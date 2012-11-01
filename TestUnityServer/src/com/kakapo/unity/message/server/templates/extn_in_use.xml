@@ -1,8 +1,0 @@
-<KakapoDocument Protocol='KEMP' Version='1.0'>
-  <Body Command='Error'>
-    <RequestCommand>Register</RequestCommand>
-    <Number>5</Number>
-    <Description> The register request failed as the extn is already in use </Description>
-    <AlertUser>False</AlertUser>
-  </Body>
-</KakapoDocument>

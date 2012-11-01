@@ -12,11 +12,13 @@ public class SingleItemSet<T> extends AbstractSet<T>
     this._item = item;
   }
 
+    @Override
   public Iterator<T> iterator()
   {
     return new SingleItemIterator<T>(this._item);
   }
 
+    @Override
   public int size()
   {
     return 1;

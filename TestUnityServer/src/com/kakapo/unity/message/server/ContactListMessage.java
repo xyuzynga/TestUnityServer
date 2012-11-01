@@ -1,5 +1,6 @@
 package com.kakapo.unity.message.server;
 
+import com.kakapo.unity.message.ContactAction;
 import com.kakapo.unity.message.Message;
 import java.util.Collection;
 

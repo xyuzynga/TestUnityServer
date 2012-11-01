@@ -2,20 +2,24 @@ package com.kakapo.unity.message.client;
 
 import java.util.Set;
 
-public class PeerMessage extends ClientMessage
+/**
+ *
+ * @author felix.vincent
+ */
+public abstract class PeerMessage extends ClientMessage
 {
   private final Set<String> _extensions;
   private final CharSequence _input;
   private final CharSequence _id;
   private final CharSequence _sender;
 
-  public PeerMessage(String command, Set<String> extensions, CharSequence input, CharSequence id, CharSequence sender)
+  public PeerMessage(String command, CharSequence id,  CharSequence sender, Set<String> extensions, CharSequence input)
   {
     super(command);
-    this._extensions = extensions;
-    this._input = input;
     this._id = id;
     this._sender = sender;
+    this._extensions = extensions;
+    this._input = input;
   }
 
   public Set<String> getExtensions()

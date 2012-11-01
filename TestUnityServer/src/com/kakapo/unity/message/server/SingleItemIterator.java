@@ -14,11 +14,13 @@ public class SingleItemIterator<T>
     this._item = item;
   }
 
+    @Override
   public boolean hasNext()
   {
     return !this._done;
   }
 
+    @Override
   public T next()
   {
     if (this._done)
@@ -30,6 +32,7 @@ public class SingleItemIterator<T>
     return this._item;
   }
 
+    @Override
   public void remove()
   {
     throw new UnsupportedOperationException("Not implemented");

@@ -1,6 +1,6 @@
 package com.kakapo.unity.server;
 
-import com.kakapo.unity.client.Client;
+import com.kakapo.unity.client.Connection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.Map;
 public class Group
 {
   private final String name;
-  private Map<String, Extension> extensions = new HashMap<String, Extension>();
+  private Map<String, ConnectedClient> extensions = new HashMap<String, ConnectedClient>();
 
   public Group(String name)
   {
@@ -26,27 +26,27 @@ public class Group
     return this.extensions.containsKey(extension);
   }
 
-  public Extension removeExtension(String extension)
+  public ConnectedClient removeExtension(String extension)
   {
     return this.extensions.remove(extension);
   }
 
-  public Extension getExtension(String extension)
+  public ConnectedClient getExtension(String extension)
   {
     return this.extensions.get(extension);
   }
 
-  public Collection<Extension> getExtensions()
+  public Collection<ConnectedClient> getExtensions()
   {
     return Collections.unmodifiableCollection(this.extensions.values());
   }
 
-  public Extension addClient(String key, Client client)
+  public ConnectedClient addClient(String key, Connection client)
   {
-    Extension extension = this.extensions.get(key);
+    ConnectedClient extension = this.extensions.get(key);
     if (extension == null)
     {
-      extension = new Extension(key, client);
+      extension = new ConnectedClient(key, client);
       this.extensions.put(key, extension);
     }
     else

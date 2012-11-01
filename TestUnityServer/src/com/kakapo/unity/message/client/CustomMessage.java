@@ -9,7 +9,7 @@ public class CustomMessage extends PeerMessage
 
   public CustomMessage(CharSequence content, Set<String> extensions, CharSequence input, CharSequence id, CharSequence sender)
   {
-    super("Custom", extensions, input, id, sender);
+    super("Custom", id , sender, extensions, input);
     this._content = content;
   }
 

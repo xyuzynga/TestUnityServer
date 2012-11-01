@@ -1,7 +1,5 @@
 package com.kakapo.unity.message;
 
-import com.kakapo.unity.util.Objects;
-
 public abstract class Message
 {
   private String _command;
@@ -21,11 +19,6 @@ public abstract class Message
   public String getCommand()
   {
     return this._command;
-  }
-
-  public String toString()
-  {
-    return Objects.toString(this);
   }
 
   public boolean isDisconnect()

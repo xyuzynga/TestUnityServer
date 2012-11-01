@@ -1,5 +1,9 @@
 package com.kakapo.unity.network;
 
+import com.kakapo.unity.client.Connection;
+import com.kakapo.unity.network.codec.MessageCodec;
+import com.kakapo.unity.network.codec.SimpleMessageCodec;
+import com.kakapo.unity.server.MemoryServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -11,11 +15,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.kakapo.unity.client.Client;
-import com.kakapo.unity.network.codec.MessageCodec;
-import com.kakapo.unity.network.codec.SimpleMessageCodec;
-import com.kakapo.unity.server.MemoryServer;
 
 public class Listener extends Thread
   implements ByteBufferFactory
@@ -109,20 +108,20 @@ public class Listener extends Thread
       socket.configureBlocking(false);
       SelectionKey readKey = socket.register(this.selector, 1);
 
-      Client client = new ClientStub(socket, this.server, this._codec, this);
+      Connection client = new ConnectionStub(socket, this.server, this._codec, this);
 
       readKey.attach(client);
     }
     else if (key.isReadable())
     {
-      ClientStub client = (ClientStub)key.attachment();
-      SocketChannel channel = (SocketChannel)key.channel();
+      ConnectionStub client = (ConnectionStub)key.attachment();
+      SocketChannel socketChannel = (SocketChannel)key.channel();
 
       ByteBuffer buffer = getByteBuffer();
       int read = -1;
       try
       {
-        read = channel.read(buffer);
+        read = socketChannel.read(buffer);
       }
       catch (Exception e)
       {
@@ -144,20 +143,20 @@ public class Listener extends Thread
           logger.log(Level.INFO, "Problem while parsing messages", t);
 
           client.disconnect();
-          channel.close();
+          socketChannel.close();
         }
 
       }
       else
       {
         client.disconnect();
-        channel.close();
+        socketChannel.close();
       }
 
     }
     else if (key.isWritable())
     {
-      ClientStub client = (ClientStub)key.attachment();
+      ConnectionStub client = (ConnectionStub)key.attachment();
       SocketChannel channel = (SocketChannel)key.channel();
       try
       {
@@ -185,11 +184,13 @@ public class Listener extends Thread
     }
   }
 
+    @Override
   public ByteBuffer getByteBuffer()
   {
     return ByteBuffer.allocate(this.bufferSize);
   }
 
+    @Override
   public void returnByteBuffer(ByteBuffer buffer)
   {
   }

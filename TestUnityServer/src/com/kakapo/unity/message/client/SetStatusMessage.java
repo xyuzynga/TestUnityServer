@@ -1,6 +1,6 @@
 package com.kakapo.unity.message.client;
 
-import com.kakapo.unity.server.ManualStatus;
+import com.kakapo.unity.message.ManualStatus;
 
 public class SetStatusMessage extends ClientMessage
 {

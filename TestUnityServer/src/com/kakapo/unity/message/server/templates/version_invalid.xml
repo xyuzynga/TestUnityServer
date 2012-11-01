@@ -1,8 +1,0 @@
-<KakapoDocument Protocol='KEMP' Version='1.0'>
-  <Body Command='Error'>
-    <RequestCommand>Register</RequestCommand>
-    <Number>4</Number>
-    <Description> The KEMP version is invalid </Description>
-    <AlertUser>False</AlertUser>
-  </Body>
-</KakapoDocument>

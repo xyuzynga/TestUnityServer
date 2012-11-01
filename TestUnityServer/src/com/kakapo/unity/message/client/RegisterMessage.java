@@ -29,4 +29,11 @@ public class RegisterMessage extends ClientMessage
   {
     return this._override;
   }
+
+    @Override
+    public String toString() {
+        return "RegisterMessage{" + "_extension=" + _extension + ", _group=" + _group + ", _override=" + _override + '}';
+    }
+  
+  
 }

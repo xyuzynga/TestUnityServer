@@ -13,6 +13,7 @@ public class OffsetCharSequence implements CharSequence
 		this._end = end;
 	}
 
+    @Override
 	public char charAt(int index)
 	{
 		if (index > this._sequence.length() + this._end)
@@ -22,16 +23,19 @@ public class OffsetCharSequence implements CharSequence
 		return this._sequence.charAt(index + this._start);
 	}
 
+    @Override
 	public int length()
 	{
 		return this._end - this._start;
 	}
 
+    @Override
 	public CharSequence subSequence(int start, int end)
 	{
 		return new OffsetCharSequence(this, start, end);
 	}
 
+    @Override
 	public String toString()
 	{
 		return new StringBuffer(this).toString();
