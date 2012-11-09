@@ -1,7 +1,6 @@
 package com.kakapo.unity.server;
 
 import com.kakapo.unity.connection.ConnectedClient;
-import com.kakapo.unity.connection.ConnectedServer;
 import com.kakapo.unity.message.server.error.OverrideMessage;
 import java.util.Collection;
 import java.util.Collections;
