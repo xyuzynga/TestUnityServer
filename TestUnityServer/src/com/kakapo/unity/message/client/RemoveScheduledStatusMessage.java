@@ -2,7 +2,7 @@ package com.kakapo.unity.message.client;
 
 public class RemoveScheduledStatusMessage extends ClientMessage {
 
-    public static final String COMMAND = "RemoveScheduledStatus";
+    public final String COMMAND = "RemoveScheduledStatus";
     private final String id;
     private final String extension;
 

@@ -4,7 +4,7 @@ import com.kakapo.unity.message.server.ServerMessage;
 
 public abstract class ErrorMessage extends ServerMessage {
 
-    public static final String COMMAND = "Error";
+    public final String COMMAND = "Error";
     private int _number;
     private boolean _alert;
     private String _key;

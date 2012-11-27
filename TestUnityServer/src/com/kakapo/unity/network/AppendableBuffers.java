@@ -13,10 +13,10 @@ public class AppendableBuffers implements Appendable {
 
     private LinkedList<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
     private ByteBuffer last;
-    private final ByteBufferFactory factory;
-    private Charset charset = Charset.forName("UTF-8");
-    private CharsetEncoder _encoder = this.charset.newEncoder();
     private boolean read;
+    private final ByteBufferFactory factory;
+    private final Charset _charset = Charset.forName("UTF-8");
+    private final CharsetEncoder _encoder = this._charset.newEncoder();
 
     public AppendableBuffers(ByteBufferFactory factory) {
         this.factory = factory;
@@ -27,13 +27,7 @@ public class AppendableBuffers implements Appendable {
             this.last.flip();
             this.last = null;
         }
-
-        if (this.read) {
-            System.out.println("Reading second time");
-        }
-
         this.read = true;
-
         return this.buffers.toArray(new ByteBuffer[this.buffers.size()]);
     }
 
@@ -54,21 +48,21 @@ public class AppendableBuffers implements Appendable {
         }
         this.last = null;
         this.read = false;
+        iterator = null;
     }
 
+    @Override
     public Appendable append(CharSequence csq) throws IOException {
         return append(csq, 0, csq.length());
     }
 
+    @Override
     public Appendable append(char c) throws IOException {
         return append(Character.valueOf(c).toString());
     }
 
+    @Override
     public Appendable append(CharSequence input, int start, int end) throws IOException {
-        if (this.read) {
-            System.out.println("Appending after read");
-        }
-
         if ((input instanceof BufferCharSequence)) {
             if (this.last != null) {
                 this.last.flip();
@@ -81,9 +75,15 @@ public class AppendableBuffers implements Appendable {
             do {
                 result = this._encoder.encode(chars, getBuffer(), false);
             } while (result.equals(CoderResult.OVERFLOW));
+            result = null;
+            chars = null;
         }
-
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return toCharSequence().toString();
     }
 
     private ByteBuffer getBuffer() {
@@ -102,27 +102,24 @@ public class AppendableBuffers implements Appendable {
         return result;
     }
 
-    public CharSequence toCharSequence() {
+    private CharSequence toCharSequence() {
         try {
             BufferCharSequence cs = new BufferCharSequence();
             for (ByteBuffer buffer : this.buffers) {
                 ByteBuffer duplicate = buffer.duplicate();
                 cs.addBuffer(duplicate);
+                duplicate = null;
             }
 
             if (this.last != null) {
                 ByteBuffer duplicate = this.last.duplicate();
                 duplicate.flip();
                 cs.addBuffer(duplicate);
+                duplicate = null;
             }
-
             return cs;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public String toString() {
-        return toCharSequence().toString();
     }
 }

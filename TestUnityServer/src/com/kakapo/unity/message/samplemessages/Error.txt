@@ -1,0 +1,5 @@
+Command: Error
+Number: 1
+Description: The Unity server has experienced an internal error and the requested operation could not be performed
+AlertUser: false
+

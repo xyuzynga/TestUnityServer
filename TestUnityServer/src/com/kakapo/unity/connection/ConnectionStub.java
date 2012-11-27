@@ -11,6 +11,8 @@ import com.kakapo.unity.message.kempcodec.MessageCodec;
 import com.kakapo.unity.message.peer.PeerMessage;
 import com.kakapo.unity.network.AppendableBuffers;
 import com.kakapo.unity.network.BufferCharSequence;
+import com.kakapo.unity.network.ByteBufferFactory;
+import com.kakapo.unity.network.ByteBufferPool;
 import com.kakapo.unity.network.Listener;
 import com.kakapo.unity.server.Server;
 import com.kakapo.unity.server.ServerGroup;
@@ -26,14 +28,28 @@ import java.util.logging.Logger;
 
 public class ConnectionStub implements Connection {
 
+    public void setGroupOrServerType(CharSequence groupOrServerType) {
+        this.groupOrServerType = groupOrServerType;
+    }
     private final Server server;
     private BufferCharSequence _input = new BufferCharSequence();
-    private AppendableBuffers output;
-    private MessageCodec codec;
+    private final ByteBufferFactory objByteBufferPool;
+    private final AppendableBuffers _output;
+    private final MessageCodec codec;
     private final Listener listener;
     private final SocketChannel channel;
     private boolean disconnect;
     private boolean registered;
+    public final AtomicInteger sent;
+    public final AtomicInteger received;
+    private CharSequence loginIdOrServerName;
+    private CharSequence groupOrServerType;
+    private Date lastMessageTime = new Date();
+    Logger logger = Logger.getLogger(ConnectionStub.class.getName());
+
+    Server getServer() {
+        return server;
+    }
 
     public CharSequence getLoginIdOrServerName() {
         return loginIdOrServerName;
@@ -42,12 +58,6 @@ public class ConnectionStub implements Connection {
     public CharSequence getGroupOrServerType() {
         return groupOrServerType;
     }
-    public final AtomicInteger sent;
-    public final AtomicInteger received;
-    private static final Logger logger;
-    private CharSequence loginIdOrServerName;
-    private CharSequence groupOrServerType;
-    private Date lastMessageTime;
 
     public ConnectionStub(SocketChannel channel, Server server, MessageCodec codec, Listener listener) {
         sent = new AtomicInteger();
@@ -56,7 +66,21 @@ public class ConnectionStub implements Connection {
         this.codec = codec;
         this.listener = listener;
         this.server = server;
-        this.output = new AppendableBuffers(listener);
+        this.objByteBufferPool = new ByteBufferPool((((UnityIMPServer) server).getDEFAULT_BUFFER_SIZE()), false);
+        this._output = new AppendableBuffers(this.objByteBufferPool);
+    }
+
+    public ConnectionStub(SocketChannel channel, Server server, MessageCodec codec, Listener listener, boolean registered, CharSequence servername) {
+        sent = new AtomicInteger();
+        received = new AtomicInteger();
+        this.channel = channel;
+        this.codec = codec;
+        this.listener = listener;
+        this.server = server;
+        this.registered = registered;
+        this.loginIdOrServerName = servername;
+        this.objByteBufferPool = new ByteBufferPool((((UnityIMPServer) server).getDEFAULT_BUFFER_SIZE()), false);
+        this._output = new AppendableBuffers(this.objByteBufferPool);
     }
 
     @Override
@@ -68,44 +92,55 @@ public class ConnectionStub implements Connection {
         while ((message = readMessage()) != null) {
             send(message);
         }
+        message = null;
+    }
+
+    public Date getLastMessageTime() {
+        return lastMessageTime;
     }
 
     @Override
     public void send(Message message) {
         received.incrementAndGet();
-        lastMessageTime=new Date();
+        lastMessageTime = new Date();
         UnityIMPServer objUnityIMPServerReference = (UnityIMPServer) this.server;
         try {
 
             //<editor-fold defaultstate="collapsed" desc="ProcessKeepAlive">
-            
+
             if ((message instanceof KeepAliveMessage)) {
                 if (!this.registered) {
                     throw new IllegalStateException("Client is not registered " + this);
                 }
-                // TODO - AJ Process KeepAlive message both for Server & Client
 
                 //</editor-fold>
 
-            //<editor-fold defaultstate="collapsed" desc="ProcessRegistration">
+                //<editor-fold defaultstate="collapsed" desc="ProcessRegistration">
 
             } else if ((message instanceof RegisterMessage)) {
                 RegisterMessage rm = (RegisterMessage) message;
-                this.groupOrServerType = (String) rm.getGroup();
-                this.loginIdOrServerName = (String) rm.getExtension();
+                this.loginIdOrServerName = rm.getExtension().toString();
+                this.groupOrServerType = rm.getGroup().toString();
                 ConnectedClient objConnectedClientLegacy = new ConnectedClient(null, this);
-                objUnityIMPServerReference.processClientRegisteration(objConnectedClientLegacy);
-                this.registered = true;
+                //TODO - FRV <Done> call getBlackListedRegistration(objConnectedClientLegacy) CANNOT BLACKLIST LEGACY CLIENT (NO CHECKSUM)
+                //TODO - FRV <Done> call checkBlackListMessageFrequency()
+                if (!(objConnectedClientLegacy.checkBlackListMessageFrequency(loginIdOrServerName.toString()))) {
+                    objUnityIMPServerReference.processClientRegisteration(objConnectedClientLegacy);
+                    this.registered = true;
+                }
             } else if ((message instanceof RegisterMessage2)) {
+
                 RegisterMessage2 objRegisterMessage2 = (RegisterMessage2) message;
-                this.groupOrServerType = (String) objRegisterMessage2.getGroup();
-                this.loginIdOrServerName = (String) objRegisterMessage2.getLoginID();
+                this.loginIdOrServerName = (objRegisterMessage2.getLoginID()).toString();
+                this.groupOrServerType = (objRegisterMessage2.getGroup()).toString();
                 ConnectedClient objConnectedClientNew = new ConnectedClient(objRegisterMessage2.getProductName(), this);
+                //TODO - FRV <Done> call getBlackListedRegistration()
+                objConnectedClientNew.getBlackListedRegistration(objRegisterMessage2.getCheckSum().toString());
                 objUnityIMPServerReference.processClientRegisteration(objConnectedClientNew);
                 this.registered = true;
             } else if ((message instanceof ServerRegisterMessage)) {
                 ServerRegisterMessage objServerRegisterMessage = (ServerRegisterMessage) message;
-                this.loginIdOrServerName = (String) objServerRegisterMessage.getServerName();
+                this.loginIdOrServerName = (objServerRegisterMessage.getServerName()).toString();
                 this.groupOrServerType = ServerGroup.SERVER_TYPE.INBOUND_SERVER_ENUM.toString();
                 ConnectedServer objConnectedServer = new ConnectedServer(this);
                 objUnityIMPServerReference.processServerRegisteration(objConnectedServer);
@@ -114,28 +149,44 @@ public class ConnectionStub implements Connection {
 
             } else if ((message instanceof ClientMessage || message instanceof PeerMessage)) {
                 if (!this.registered) {
+
                     throw new IllegalStateException("Client is not registered " + this);
                 }
+                //TODO - FRV <Done> getBlackListedMessageFrequency()
+                objUnityIMPServerReference.getGroups().get(groupOrServerType.toString()).getConnectedClient(loginIdOrServerName.toString()).getBlackListedMessageFrequency();
+
                 objUnityIMPServerReference.getGroups().get(groupOrServerType.toString()).getConnectedClient(loginIdOrServerName.toString()).send(message);
 
             } else if ((message instanceof InterServerMessage)) {
                 if (!this.registered) {
-                    throw new IllegalStateException("Server is not registered " + this);
+                    throw new IllegalStateException("Server is not registered ");
                 }
-                objUnityIMPServerReference.getGroups().get(groupOrServerType.toString()).getConnectedClient(loginIdOrServerName.toString()).send(message);
+                // objUnityIMPServerReference.getGroups().get(groupOrServerType.toString()).getConnectedClient(loginIdOrServerName.toString()).send(message);
+                if (objUnityIMPServerReference.getINBOUND_SERVERS().containsConnectedServer(loginIdOrServerName.toString())) {
+                    objUnityIMPServerReference.getINBOUND_SERVERS().getConnectedServer(loginIdOrServerName.toString()).send((InterServerMessage) message);
+                } else {
+                    objUnityIMPServerReference.getOUTBOUND_SERVERS().getConnectedServer(loginIdOrServerName.toString()).send((InterServerMessage) message);
+                }
+
             } else {
                 throw new IllegalArgumentException("Unknown message" + message);
             }
 
         } catch (IllegalStateException | IllegalArgumentException e) {
+            try {
+                this.channel.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ConnectionStub.class.getName()).log(Level.SEVERE, null, ex);
+            }
             logger.log(Level.WARNING, "Problem processing message " + message, e);
         }
+        objUnityIMPServerReference = null;
     }
 
     private Message readMessage() {
         if (this._input.length() > 0) {
 
-            //TODO - PP Kemp decode
+            //TODO - PP  <Done> Kemp decode
             MessageCodec.DecodeResult result = this.codec.decode(this._input);
 
             if (result != null) {
@@ -144,6 +195,7 @@ public class ConnectionStub implements Connection {
                 this._input = ((BufferCharSequence) this._input.subSequence(result.chars, this._input.length()));
                 return message;
             }
+            result = null;
         }
 
         return null;
@@ -157,23 +209,22 @@ public class ConnectionStub implements Connection {
                 if (input != null) {
                     assert ("Command: Message".contentEquals(input.subSequence(0, "Command: Message".length())));
 
-                    this.output.append(input);
+                    this._output.append(input);
                 } else {
-                    //TODO - PP & FRV Kemp Encode
-                    this.codec.encode(message, this.output);
+                    //TODO - PP & FRV  <Done> Kemp Encode
+                    this.codec.encode(message, this._output);
                 }
+                input = null;
             } else {
-                this.codec.encode(message, this.output);
+                this.codec.encode(message, this._output);
             }
 
             sent.incrementAndGet();
             if (sent.get() % 10000 == 0) {
-                System.out.println("Sent: " + sent.get());
-                System.out.println("Received: " + received.get());
             }
 
         } catch (Exception e) {
-            this.output.clear();
+            this._output.clear();
 
             throw new RuntimeException(e);
         }
@@ -195,21 +246,23 @@ public class ConnectionStub implements Connection {
 
     public boolean write(SocketChannel channel)
             throws IOException {
-        if (logger.isLoggable(Level.FINE)) {
-            String writing = this.output.toString();
-            logger.fine(writing);
-        }
-
-        ByteBuffer[] buffers = this.output.getBuffersForReading();
-
+        ByteBuffer[] buffers = this._output.getBuffersForReading();
         channel.write(buffers);
-
-        boolean finished = this.output.isComplete();
+        boolean finished = this._output.isComplete();
 
         if (finished) {
-            this.output.clear();
+            this._output.clear();
+        }
+        if (isDisconnect()) {
+            try {
+                this.channel.configureBlocking(true);
+                this.channel.close();
+            } catch (IOException iOException) {
+                Logger.getLogger(ConnectionStub.class.getName()).log(Level.SEVERE, "Marked to disconnect - Closing channel", iOException);
+            }
         }
 
+        buffers = null;
         return finished;
     }
 
@@ -217,11 +270,20 @@ public class ConnectionStub implements Connection {
     public void disconnect() {
         this.server.unregister(this);
         this.registered = false;
+        try {
+            this.channel.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectionStub.class.getName()).log(Level.SEVERE, "Problem while Disconnecting - Closing channel", ex);
+        }
+
     }
 
-    static {
-        logger = Logger.getLogger(ConnectionStub.class.getName());
+    @Override
+    public String toString() {
+        return "ConnectionStub{\n\t " + " loginIdOrServerName = " + loginIdOrServerName + "\n\t groupOrServerType = " + groupOrServerType + "\n\t lastMessageTime = " + lastMessageTime + "\n\t}";
     }
 
-    
+    public SocketChannel getChannel() {
+        return channel;
+    }
 }

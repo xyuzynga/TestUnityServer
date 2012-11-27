@@ -15,9 +15,9 @@ import java.util.List;
 public class BufferCharSequence implements CharSequence {
 
     private LinkedList<BufferHolder> _bufferHolders = new LinkedList<BufferHolder>();
-    private static Charset _charset = Charset.forName("UTF-8");
-    private static CharsetDecoder _decoder = _charset.newDecoder();
-    private static CharsetEncoder _encoder = _charset.newEncoder();
+    private Charset _charset = Charset.forName("UTF-8");
+    private CharsetDecoder _decoder = _charset.newDecoder();
+    private CharsetEncoder _encoder = _charset.newEncoder();
 
     public BufferCharSequence() {
     }
@@ -45,8 +45,12 @@ public class BufferCharSequence implements CharSequence {
                 previous = replacement;
 
                 this._bufferHolders.add(replacement);
+                replacement = null;
+                original = null;
             }
         }
+        previous = null;
+        holders = null;
     }
 
     public void addBuffer(ByteBuffer buffer) throws IOException {
@@ -57,19 +61,25 @@ public class BufferCharSequence implements CharSequence {
         if (!this._bufferHolders.isEmpty()) {
             BufferHolder previous = this._bufferHolders.getLast();
             holder.total += previous.total + previous.view.length();
+            previous = null;
         }
         this._bufferHolders.add(holder);
+
+        holder = null;
     }
 
+    @Override
     public char charAt(int index) {
         for (BufferHolder holder : this._bufferHolders) {
             if (index < holder.total + holder.view.length()) {
                 return holder.view.charAt(index - holder.total);
             }
+            holder = null;
         }
         throw new IndexOutOfBoundsException();
     }
 
+    @Override
     public int length() {
         if (this._bufferHolders.isEmpty()) {
             return 0;
@@ -79,6 +89,7 @@ public class BufferCharSequence implements CharSequence {
         return last.total + last.view.length();
     }
 
+    @Override
     public CharSequence subSequence(int start, int end) {
         return new BufferCharSequence(this, start, end);
     }
@@ -87,11 +98,14 @@ public class BufferCharSequence implements CharSequence {
         List<ByteBuffer> result = new ArrayList<ByteBuffer>();
         for (BufferHolder holder : this._bufferHolders) {
             try {
+                holder.view.mark();
                 result.add(_encoder.encode(holder.view));
-                holder.view.rewind();
+//                holder.view.rewind();
+                holder.view.reset();
             } catch (CharacterCodingException e) {
                 throw new RuntimeException("Problem while re-encoding CharBuffer to ByteBuffer", e);
             }
+            holder = null;
         }
         return result;
     }

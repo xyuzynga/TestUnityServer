@@ -1,0 +1,34 @@
+Nov 27, 2012 11:52:09 AM com.kakapo.unity.server.UnityIMPServer startup
+INFO: Looking up for previously connected servers from database
+Nov 27, 2012 11:52:09 AM com.kakapo.unity.server.UnityIMPServer startup
+INFO: Attempting to connect to server: felix.unityclient.com
+Nov 27, 2012 11:52:09 AM com.kakapo.unity.server.UnityIMPServer startup
+INFO: Sending Server register message
+Nov 27, 2012 11:52:09 AM com.kakapo.unity.server.UnityIMPServer startup
+INFO: Updated the server table with details of this server
+Nov 27, 2012 11:52:10 AM com.kakapo.unity.server.UnityIMPServer processServerRegisteration
+INFO: 
+
+Server Registeration ->
+Nov 27, 2012 11:52:10 AM com.kakapo.unity.server.UnityIMPServer processServerRegisteration
+INFO: server1.unityclient.com is added to the INBOUND_SERVERS group
+Nov 27, 2012 11:52:19 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,970,856 *****
+Nov 27, 2012 11:52:30 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,968,832 *****
+Nov 27, 2012 11:52:40 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,968,832 *****
+Nov 27, 2012 11:52:50 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,968,832 *****
+Nov 27, 2012 11:53:01 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,968,832 *****
+Nov 27, 2012 11:53:11 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,965,648 *****
+Nov 27, 2012 11:53:21 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,963,840 *****
+Nov 27, 2012 11:53:31 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,963,840 *****
+Nov 27, 2012 11:53:42 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,963,840 *****
+Nov 27, 2012 11:53:52 AM com.kakapo.unity.network.Listener run
+WARNING: ***** totalMemory = 63,700,992 	***** freeMemory = 61,963,840 *****

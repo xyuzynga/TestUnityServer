@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class AddScheduledStatusMessage extends ClientMessage {
 
-    public static final String COMMAND = "AddScheduledStatus";
+    public final String COMMAND = "AddScheduledStatus";
     private final ScheduledStatus scheduledStatus;
     private final String extension;
 

@@ -1,0 +1,10 @@
+Command: ServerMessage
+Group: DRD Communication
+Command: Message2
+Id: DRDCommunications8006@drd.co.uk_944135
+Sender: DRDCommunications8006@drd.co.uk
+DateTime: 2012-15-13 15:47:35.879Z
+Extensions: DRDCommunications8005@drd.co.uk
+Length: 32
+wG2+H80RD8LAbb4fzREPwlsv9KvhnJBP
+

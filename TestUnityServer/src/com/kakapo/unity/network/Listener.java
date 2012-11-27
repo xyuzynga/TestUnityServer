@@ -1,10 +1,9 @@
 package com.kakapo.unity.network;
 
-import com.kakapo.unity.connection.ConnectionStub;
+import com.kakapo.unity.connection.ConnectedClient;
 import com.kakapo.unity.connection.Connection;
+import com.kakapo.unity.connection.ConnectionStub;
 import com.kakapo.unity.message.kempcodec.MessageCodec;
-import com.kakapo.unity.message.kempcodec.legacy.SimpleMessageCodec;
-import com.kakapo.unity.server.Server;
 import com.kakapo.unity.server.UnityIMPServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,22 +17,23 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Listener extends Thread
-        implements ByteBufferFactory {
+public class Listener extends Thread {
 
     private boolean _running = true;
     private Selector selector;
     private ServerSocketChannel channel[];
     private final UnityIMPServer server;
-    private final MessageCodec _codec = new SimpleMessageCodec();
-    private final int bufferSize;
-    private static final Logger logger = Logger.getLogger(Listener.class.getName());
+    private final MessageCodec _codec;
+    private final Logger logger = Logger.getLogger(Listener.class.getName());
     private final int period;
+    private final ByteBufferFactory objByteBufferPool;
+    private final Runtime rt = Runtime.getRuntime();
 
     public Listener(String ports[], int bufferSize, int period, UnityIMPServer server) {
-        this.bufferSize = bufferSize;
         this.period = period;
         this.server = server;
+        this._codec = server.getObjKempCodec().getMessageCodec();
+        this.objByteBufferPool = new ByteBufferPool(bufferSize, false);
         try {
             this.selector = Selector.open();
             channel = new ServerSocketChannel[ports.length];
@@ -55,6 +55,7 @@ public class Listener extends Thread
 
     @Override
     public void run() {
+        long before = System.currentTimeMillis();
         while (this._running) {
             try {
                 this.selector.select(this.period);
@@ -78,7 +79,9 @@ public class Listener extends Thread
                         key.cancel();
                     }
                 }
+                key = null;
             }
+
             try {
                 this.server.processScheduledStatuses();
             } catch (Throwable t) {
@@ -86,18 +89,29 @@ public class Listener extends Thread
             }
 
             try {
-
+                //TODO - FRV  <Done> Enable after testing
                 this.server.sendServerKeepAliveMessage();
             } catch (Throwable t) {
                 logger.log(Level.SEVERE, "Problem while sending Keep alive messages to all servers", t);
             }
 
             try {
+                //TODO - FRV  <Done> Enable after testing
                 this.server.processDisconnection();
             } catch (Throwable t) {
                 logger.log(Level.SEVERE, "Problem while processing disconnection events", t);
             }
 
+            keys = null;
+            iterator = null;
+
+            System.gc();
+            long now = System.currentTimeMillis();
+            if (now - before > 10000) {
+                System.out.println();
+                logger.log(Level.WARNING, "***** totalMemory = {0} \t***** freeMemory = {1} *****", new Object[]{rt.totalMemory(), rt.freeMemory()});
+                before = now;
+            }
         }
     }
 
@@ -120,11 +134,11 @@ public class Listener extends Thread
             readKey.attach(client);
 
         } else if (key.isReadable()) {
-            ConnectionStub client = (ConnectionStub) key.attachment();
+            ConnectionStub objConnectionStubRef = (ConnectionStub) key.attachment();
             SocketChannel socketChannel = (SocketChannel) key.channel();
 
-            ByteBuffer buffer = getByteBuffer();
-            System.out.println("bb" + buffer.toString());
+            ByteBuffer buffer = objByteBufferPool.getByteBuffer();
+
             int read = -1;
             try {
                 read = socketChannel.read(buffer);
@@ -137,29 +151,37 @@ public class Listener extends Thread
             if (read > 0) {
                 try {
                     buffer.flip();
-                    client.read(buffer);
+                    objConnectionStubRef.read(buffer);
                 } catch (Throwable t) {
                     logger.log(Level.INFO, "Problem while parsing messages", t);
-
-                    client.disconnect();
-                    socketChannel.close();
+                    //TODO - FRV  <Done> Enable after unit testing
+                    if (!((objConnectionStubRef.getGroupOrServerType().toString()).contains("BOUND_SERVER_ENUM"))) { /* Ensures that connection is not server but client*/
+                        Logger.getLogger(ConnectedClient.class.getName()).log(Level.FINE, "\n\ndisconnect() called from processSelection()");
+                        objConnectionStubRef.disconnect();
+                    }
+//                    socketChannel.close(); /*Already called indisconnect()*/
                 }
 
             } else {
-                client.disconnect();
-                socketChannel.close();
+                Logger.getLogger(ConnectedClient.class.getName()).log(Level.FINE, "\n\ndisconnect() called from processSelection()");
+                objConnectionStubRef.disconnect();
+//                socketChannel.close(); /*Already called indisconnect()*/
             }
+            objConnectionStubRef = null;
+            socketChannel = null;
+            buffer = null;
 
         } else if (key.isWritable()) {
-            ConnectionStub client = (ConnectionStub) key.attachment();
+            ConnectionStub objConnectionStubRef = (ConnectionStub) key.attachment();
             SocketChannel channel = (SocketChannel) key.channel();
             try {
-                if (client.write(channel)) {
+                if (objConnectionStubRef.write(channel)) {
                     key.interestOps(1);
 
-                    if (client.isDisconnect()) {
-                        client.disconnect();
-                        channel.close();
+                    if (objConnectionStubRef.isDisconnect()) {
+                        Logger.getLogger(ConnectedClient.class.getName()).log(Level.FINE, "\n\ndisconnect() called from processSelection() - key.isWritable");
+                        objConnectionStubRef.disconnect();
+//                        channel.close(); /*Already called indisconnect()*/
                     }
                 }
 
@@ -169,19 +191,13 @@ public class Listener extends Thread
                 if (!e.getMessage().equals("Broken pipe")) {
                     logger.log(Level.INFO, "Could not write to client", e);
                 }
-                client.disconnect();
-                channel.close();
+                Logger.getLogger(ConnectedClient.class.getName()).log(Level.FINE, "\n\ndisconnect() called from processSelection() - key.isWritable");
+                objConnectionStubRef.disconnect();
+//                channel.close(); /*Already called indisconnect()*/
             }
+            objConnectionStubRef = null;
+            channel = null;
         }
-    }
-
-    @Override
-    public ByteBuffer getByteBuffer() {
-        return ByteBuffer.allocate(this.bufferSize);
-    }
-
-    @Override
-    public void returnByteBuffer(ByteBuffer buffer) {
     }
 
     /**

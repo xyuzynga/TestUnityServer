@@ -2,7 +2,7 @@ package com.kakapo.unity.message.client;
 
 public class RegisterMessage2 extends ClientMessage {
 
-    public static final String COMMAND = "Register2";
+    public final String COMMAND = "Register2";
     private final CharSequence _loginID;
     private final CharSequence _checkSum;
     private final CharSequence _group;
@@ -16,7 +16,7 @@ public class RegisterMessage2 extends ClientMessage {
         this._productName = productName;
     }
 
-    public static String getCOMMAND() {
+    public String getCOMMAND() {
         return COMMAND;
     }
 

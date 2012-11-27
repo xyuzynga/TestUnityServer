@@ -1,5 +1,6 @@
 package com.kakapo.unity.message.kempcodec.legacy;
 
+import com.kakapo.unity.network.OffsetCharSequence;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -8,7 +9,7 @@ import java.util.regex.Pattern;
 public class LineReader
         implements Iterator<CharSequence> {
 
-    private static final Pattern pattern = Pattern.compile("(.*)[\\r]?[\\n]?");
+    private final Pattern pattern = Pattern.compile("(.*)[\\r]?[\\n]?");
     private CharSequence _source;
     private CharSequence _next;
     private Matcher _matcher;

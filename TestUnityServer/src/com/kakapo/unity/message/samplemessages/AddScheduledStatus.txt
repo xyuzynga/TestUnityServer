@@ -1,0 +1,7 @@
+Command: AddScheduledStatus
+Extension: DRDCommunications8006@drd.co.uk
+Status: eCqADjCBPov4Q6alJVdGcrKjF0GQbmJCJ/REpPSgNf45jW8EPqQ4Mm+EUVVoXKQsCcfkSXDJLCRZl6en9LipVLFMZjeaR7w4zvEI3QglBAkpyHXq0nIDG8mEykD92aBOANnBdb/Vv56IzrXjVS3pcESmoyBkg+76eokVHS88hqtMSTyr8koIC6o1TGpUalaRFalKdW63XLqDyBYqpwlvnpQ/4SmBGDGUNhi/xkbl4nC/KS1qEgZD33aBzEP6WXJXrJFCMMeHj0/nd6b3SwzFfPQoDt/D/p4+
+Id: DRDCommunications8006@drd.co.uk_634896059025315532
+Start: 2012-11-27:4:15:01:00
+End: 2012-11-27:5:30:00:00
+

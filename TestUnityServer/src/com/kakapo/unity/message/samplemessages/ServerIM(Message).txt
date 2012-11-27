@@ -1,0 +1,10 @@
+Command: ServerMessage
+Group: DRD Communication
+Command: Message
+Id: DRDCommunications8006@drd.co.uk_94413
+Sender: DRDCommunications8006@drd.co.uk
+Share: true
+Extensions: DRDCommunications8005@drd.co.uk
+Length: 32
+wG2+H80RD8LAbb4fzREPwlsv9KvhnJBP
+

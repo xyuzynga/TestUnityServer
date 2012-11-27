@@ -1,8 +1,8 @@
 package com.kakapo.unity.connection;
 
+import com.kakapo.unity.message.KeepAliveMessage;
 import com.kakapo.unity.message.Message;
 import com.kakapo.unity.message.interserver.InterServerMessage;
-import com.kakapo.unity.util.Objects;
 
 public class ConnectedServer {
 
@@ -14,26 +14,30 @@ public class ConnectedServer {
     }
 
     public void receive(Message message) {
-        //TODO - FRV method for the Connected server to receive any of the messages of type CLIENT or KEEPALIVE
-
-
-
+        //TODO - FRV <Done> method for the Connected server to receive any of the messages of type CLIENT or KEEPALIVE
         ConnectionStub objConnectionStub = (ConnectionStub) this.objConnection;
-        objConnectionStub.receive(message);
+        if (message instanceof InterServerMessage || message instanceof KeepAliveMessage) {
+            objConnectionStub.receive(message);
+        } else {
+            throw new IllegalArgumentException("Server can only receive messages of type INTERSERVER or KEEPALIVE");
+        }
         objConnectionStub = null;
 
-        throw new UnsupportedOperationException("Not yet implemented receive(InterServerMessage message)");
+//        throw new UnsupportedOperationException("Not yet implemented receive(InterServerMessage message)");
     }
 
     public void send(InterServerMessage message) {
 
-        //TODO - FRV call processInterServerMessage() in  UnityIMPServer
-        throw new UnsupportedOperationException("Not yet implemented send(InterServerMessage registerMessage)");
-    }
+        //TODO - FRV <Done> call processInterServerMessage() in  UnityIMPServer
+        ConnectionStub objConnectionStub = (ConnectionStub) this.objConnection;
+        if (message instanceof InterServerMessage /*KeepAliveMessage is already processed in connectionStub */) {
+            objConnectionStub.getServer().processInterServerMessage(objConnection, message);
+        } else {
+            throw new IllegalArgumentException("Server can only send messages of type INTERSERVER or KEEPALIVE");
+        }
+        objConnectionStub = null;
 
-    @Override
-    public String toString() {
-        return Objects.toString(this);
+//        throw new UnsupportedOperationException("Not yet implemented send(InterServerMessage registerMessage)");
     }
 
     public Connection getConnection() {

@@ -1,0 +1,5 @@
+Command: ServerSetStatus
+Group: DRD Communication
+ExtensionStatus: DRDCommunications8005@drd.co.uk 9RayB6EWRVYqJhbfpo0nsAVW7bkgJp9fC61gwYTZdWtqKAsOtJntVVJXj9KfO7t8dTejkHuc++CegF0JIQ5KfeAmz9RPHb3xWLIWqKVXWv1mgQPiw+ehtPYl5ORi01IvtdHW181DKVf/G/F69ZFORAgYQ0Odusd3JeMaAvVFXnPtvhFR+FxrQfDmy1E6NUV/7rDY4cENShc= 2012-02-04:15:58:29
+Override: True
+

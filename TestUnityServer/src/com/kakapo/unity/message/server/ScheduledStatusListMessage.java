@@ -5,7 +5,7 @@ import java.util.Collection;
 
 public class ScheduledStatusListMessage extends ServerMessage {
 
-    public static final String COMMAND = "ScheduledStatusList";
+    public final String COMMAND = "ScheduledStatusList";
     private final Collection<ScheduledStatus> statuses;
 
     public ScheduledStatusListMessage(Collection<ScheduledStatus> statuses) {

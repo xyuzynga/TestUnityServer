@@ -1,0 +1,6 @@
+Command: Register2
+Group: DRD Communication
+LoginID: DRDCommunications8006@drd.co.uk
+CheckSum: fsvl5ghoejcvn3p948fneu
+ProductName: UnityDesktop
+

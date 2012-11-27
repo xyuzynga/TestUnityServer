@@ -3,13 +3,13 @@ package com.kakapo.unity.server;
 import com.kakapo.unity.connection.ConnectedServer;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerGroup {
 
     private final SERVER_TYPE serverType;
-    private Map<String, ConnectedServer> objConnectedServerHashMap = new HashMap<>();
+    private Map<String, ConnectedServer> objConnectedServerHashMap = new ConcurrentHashMap<>();
 
     public ServerGroup(SERVER_TYPE serverType) {
         this.serverType = serverType;
@@ -36,8 +36,8 @@ public class ServerGroup {
     }
 
     public void addServer(String strServerName, ConnectedServer connectedServer) {
-        //TODO - AKB Add server
-        throw new UnsupportedOperationException("Not yet implemented");
+        //TODO - AKB <Done> Add server
+        objConnectedServerHashMap.put(strServerName, connectedServer);
     }
 
     public boolean isEmpty() {
@@ -47,7 +47,7 @@ public class ServerGroup {
     /**
      * All Server.Error messages
      */
-    public static enum SERVER_TYPE {
+    public enum SERVER_TYPE {
 
         INBOUND_SERVER_ENUM,
         OUTBOUND_SERVER_ENUM;

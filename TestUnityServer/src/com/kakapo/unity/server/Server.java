@@ -8,7 +8,7 @@ import com.kakapo.unity.message.interserver.InterServerMessage;
 
 public abstract interface Server {
 
-    public abstract boolean startup();
+    public abstract void startup();
 
     public abstract void processClientRegisteration(ConnectedClient paramClient);
 

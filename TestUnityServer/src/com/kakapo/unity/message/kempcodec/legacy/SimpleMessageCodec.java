@@ -13,28 +13,28 @@ import com.kakapo.unity.message.client.RemoveExtensionMessage;
 import com.kakapo.unity.message.client.RemoveScheduledStatusMessage;
 import com.kakapo.unity.message.client.SetStatusMessage;
 import com.kakapo.unity.message.kempcodec.MessageCodec;
-import com.kakapo.unity.message.kempcodec.legacy.LineReader;
-import com.kakapo.unity.message.peer.CustomMessage;
 import com.kakapo.unity.message.peer.TextMessage;
 import com.kakapo.unity.message.server.ContactListMessage;
 import com.kakapo.unity.message.server.ScheduledStatusListMessage;
 import com.kakapo.unity.message.server.StatusListMessage;
 import com.kakapo.unity.message.server.error.ErrorMessage;
 import com.kakapo.unity.message.server.error.InternalErrorMessage;
+import com.kakapo.unity.message.server.error.Legacy.ExtensionInUseMessage;
+import com.kakapo.unity.message.server.error.Legacy.MaxConnectionsMessage;
+import com.kakapo.unity.message.server.error.Legacy.RedirectErrorMessage;
+import com.kakapo.unity.message.server.error.Legacy.ShutDownMessage;
 import com.kakapo.unity.message.server.error.OverrideMessage;
-import com.kakapo.unity.util.Objects;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -42,20 +42,29 @@ import java.util.regex.Pattern;
 public class SimpleMessageCodec
         implements MessageCodec {
 
-    private static final Logger logger;
-    private static final String DEFAULT_STATUS = "none";
-    private final ResourceBundle _messages;
+    private final String DEFAULT_STATUS = "none";
+//    private final ResourceBundle _messages;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss");
-    private static final Pattern BLANK_LINE_PATTERN;
+    private final Logger logger = Logger.getLogger(SimpleMessageCodec.class.getName());
+    private final Pattern BLANK_LINE_PATTERN = Pattern.compile("(?:\\r?\\n){2,}", 32);
 
     public SimpleMessageCodec() {
-        this._messages = ResourceBundle.getBundle("messages");
-        this.dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+//        this._messages = ResourceBundle.getBundle("messages");
+//        this.dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    private CharSequence readProperty(String name, LineReader lines) {
+        Property property = new Property(lines.next());
+        if ((property.name == null) || (!name.contentEquals(property.name))) {
+            throw new IllegalArgumentException(new StringBuilder().append("Expected ").append(name).append(" but read ").append(property.name).toString());
+        }
+        return property.value;
     }
 
     @Override
+    @SuppressWarnings("empty-statement")
     public synchronized MessageCodec.DecodeResult decode(CharSequence encoded) {
-        if (logger.isLoggable(Level.FINE)) {
+        if (logger.isLoggable(Level.FINER)) {
             logger.fine(encoded.toString());
         }
 
@@ -85,15 +94,15 @@ public class SimpleMessageCodec
                 CharSequence text = readFreeText(lines, encoded);
                 complete = checkMessageEnd(lines);
                 result = new TextMessage(text, extensions, encoded.subSequence(0, lines.position()), id, sender, share);
-            } else if ("Custom".contentEquals(property.value)) {
-                CharSequence id = readProperty("Id", lines);
-                CharSequence sender = readProperty("Sender", lines);
-                Set<String> extensions = readExtensions(lines);
-                CharSequence text = readFreeText(lines, encoded);
-                result = new CustomMessage(text, extensions, encoded.subSequence(0, lines.position()), id, sender);
-                complete = checkMessageEnd(lines);
+//            } else if ("Custom".contentEquals(property.value)) {
+//                CharSequence id = readProperty("Id", lines);
+//                CharSequence sender = readProperty("Sender", lines);
+//                Set<String> extensions = readExtensions(lines);
+//                CharSequence text = readFreeText(lines, encoded);
+//                result = new CustomMessage(text, extensions, encoded.subSequence(0, lines.position()), id, sender);
+//                complete = checkMessageEnd(lines);
             } else if ("ContactList".contentEquals(property.value)) {
-                List<ContactAction> actions = new ArrayList<ContactAction>();
+                List<ContactAction> actions = new ArrayList<>();
                 CharSequence line;
                 while ((line = lines.next()).length() > 0) {
                     Property actionProperty = new Property(line);
@@ -112,24 +121,24 @@ public class SimpleMessageCodec
                     case 1:
                         result = new InternalErrorMessage();
                         break;
-//        case 2:
-//          result = new MaxConnectionsMessage(readProperty("RedirectHostName", lines).toString());
-//          break;
-//        case 3:
-//          result = new MaxConnectionsMessage();
-//          break;
-//        case 5:
-//          result = new ExtensionInUseMessage();
-//          break;
+                    case 2:
+                        result = new MaxConnectionsMessage(readProperty("RedirectHostName", lines).toString());
+                        break;
+                    case 3:
+                        result = new MaxConnectionsMessage();
+                        break;
+                    case 5:
+                        result = new ExtensionInUseMessage();
+                        break;
                     case 6:
                         result = new OverrideMessage();
                         break;
-//        case 7:
-//          result = new ShutDownMessage(readProperty("RedirectHostName", lines).toString());
-//          break;
-//        case 8:
-//          result = new ShutDownMessage();
-//        case 4:
+                    case 7:
+                        result = new ShutDownMessage(readProperty("RedirectHostName", lines).toString());
+                        break;
+                    case 8:
+                        result = new ShutDownMessage();
+                    case 4:
                 }
 
                 while (lines.next().length() > 0);
@@ -183,7 +192,7 @@ public class SimpleMessageCodec
                 result = message;
                 complete = true;
             } else if ("ScheduledStatusList".contentEquals(property.value)) {
-                List<ScheduledStatus> actions = new ArrayList<ScheduledStatus>();
+                List<ScheduledStatus> actions = new ArrayList<>();
                 CharSequence line;
                 while ((line = lines.next()).length() > 0) {
                     Property actionProperty = new Property(line);
@@ -196,7 +205,7 @@ public class SimpleMessageCodec
             } else {
                 throw new IllegalArgumentException(new StringBuilder().append("Unknown command: ").append(property.value).toString());
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | ParseException e) {
             String text = encoded.toString();
 
             if (BLANK_LINE_PATTERN.matcher(text).find()) {
@@ -213,10 +222,61 @@ public class SimpleMessageCodec
         return null;
     }
 
+    private boolean checkMessageEnd(LineReader lines) {
+        if (lines.hasNext()) {
+            CharSequence line = lines.next();
+            if (line.length() > 0) {
+                throw new IllegalStateException(new StringBuilder().append("Found extra line at end of message: ").append(line.toString()).toString());
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private CharSequence readFreeText(LineReader lines, CharSequence input) {
+        Property property = new Property(lines.next());
+        if ((property.name == null) || (!"Length".contentEquals(property.name))) {
+            throw new IllegalStateException("Expected Length");
+        }
+
+        int length = Integer.parseInt(property.value.toString());
+        CharSequence sequence = input.subSequence(lines.position(), lines.position() + length);
+
+        lines.position(lines.position() + length);
+
+        lines.next();
+
+        return sequence;
+    }
+
+    private Set<String> readExtensions(LineReader lines) {
+        Property property = new Property(lines.next());
+        assert ("Extensions".contentEquals(property.name));
+        Set<String> extensions = new HashSet<>();
+        StringTokenizer tokenizer = new StringTokenizer(property.value.toString(), " ,");
+        while (tokenizer.hasMoreTokens()) {
+            extensions.add(tokenizer.nextToken());
+        }
+        return extensions;
+    }
+
+    private void appendProperty(CharSequence name, CharSequence value, Appendable output) {
+        assert (!value.toString().contains("\n"));
+        try {
+            output.append(name);
+            output.append(": ");
+            output.append(value);
+            output.append('\n');
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public synchronized void encode(Message message, Appendable original) {
         Appendable output = original;
-        if (logger.isLoggable(Level.FINE)) {
+        if (logger.isLoggable(Level.FINER)) { /*SHOULD NOT BE USED - PERFORMANCE DETERIORATION*/
             output = new StringBuilder();
         }
 
@@ -242,24 +302,22 @@ public class SimpleMessageCodec
                 appendProperty("Share", Boolean.toString(tm.isShare()), output);
                 writeExtensions(tm.getExtensions(), output);
                 appendFreeText(tm.getText(), output);
-            } else if ((message instanceof CustomMessage)) {
-                CustomMessage tm = (CustomMessage) message;
-                writeExtensions(tm.getExtensions(), output);
-                appendFreeText(tm.getContent(), output);
+//            } else if ((message instanceof CustomMessage)) {
+//                CustomMessage tm = (CustomMessage) message;
+//                writeExtensions(tm.getExtensions(), output);
+//                appendFreeText(tm.getContent(), output);
             } else if ((message instanceof ErrorMessage)) {
                 ErrorMessage em = (ErrorMessage) message;
                 appendProperty("Number", Integer.toString(em.getNumber()), output);
-                appendProperty("Description", this._messages.getString(em.getKey()), output);
+//                appendProperty("Description", this._messages.getString(em.getKey()), output);
                 appendProperty("AlertUser", Boolean.toString(em.isAlert()), output);
 
-//        if ((message instanceof RedirectErrorMessage))
-//        {
-//          String redirect = ((RedirectErrorMessage)message).getRedirect();
-//          if (redirect != null)
-//          {
-//            appendProperty("RedirectHostName", redirect, output);
-//          }
-//        }
+                if ((message instanceof RedirectErrorMessage)) {
+                    String redirect = ((RedirectErrorMessage) message).getRedirect();
+                    if (redirect != null) {
+                        appendProperty("RedirectHostName", redirect, output);
+                    }
+                }
             } else if ((message instanceof SetStatusMessage)) {
                 SetStatusMessage usm = (SetStatusMessage) message;
                 appendProperty("Extension", usm.getExtension(), output);
@@ -317,72 +375,13 @@ public class SimpleMessageCodec
             throw new RuntimeException(e);
         }
 
-        if (logger.isLoggable(Level.FINE)) {
+        if (logger.isLoggable(Level.FINER)) {        /*SHOULD NOT BE USED - PERFORMANCE DETERIORATION*/
             logger.fine(output.toString());
             try {
                 original.append(output.toString());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-    }
-
-    private boolean checkMessageEnd(LineReader lines) {
-        if (lines.hasNext()) {
-            CharSequence line = lines.next();
-            if (line.length() > 0) {
-                throw new IllegalStateException(new StringBuilder().append("Found extra line at end of message: ").append(line.toString()).toString());
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    private CharSequence readFreeText(LineReader lines, CharSequence input) {
-        Property property = new Property(lines.next());
-        if ((property.name == null) || (!"Length".contentEquals(property.name))) {
-            throw new IllegalStateException("Expected Length");
-        }
-
-        int length = Integer.parseInt(property.value.toString());
-        CharSequence sequence = input.subSequence(lines.position(), lines.position() + length);
-
-        lines.position(lines.position() + length);
-
-        lines.next();
-
-        return sequence;
-    }
-
-    private Set<String> readExtensions(LineReader lines) {
-        Property property = new Property(lines.next());
-        assert ("Extensions".contentEquals(property.name));
-        Set<String> extensions = new HashSet<String>();
-        StringTokenizer tokenizer = new StringTokenizer(property.value.toString(), " ,");
-        while (tokenizer.hasMoreTokens()) {
-            extensions.add(tokenizer.nextToken());
-        }
-        return extensions;
-    }
-
-    private CharSequence readProperty(String name, LineReader lines) {
-        Property property = new Property(lines.next());
-        if ((property.name == null) || (!name.contentEquals(property.name))) {
-            throw new IllegalArgumentException(new StringBuilder().append("Expected ").append(name).append(" but read ").append(property.name).toString());
-        }
-        return property.value;
-    }
-
-    private void appendProperty(CharSequence name, CharSequence value, Appendable output) {
-        assert (!value.toString().contains("\n"));
-        try {
-            output.append(name);
-            output.append(": ");
-            output.append(value);
-            output.append('\n');
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -409,13 +408,7 @@ public class SimpleMessageCodec
         }
     }
 
-    static {
-        logger = Logger.getLogger(SimpleMessageCodec.class.getName());
-
-        BLANK_LINE_PATTERN = Pattern.compile("(?:\\r?\\n){2,}", 32);
-    }
-
-    private static class Property {
+    private class Property {
 
         CharSequence name;
         CharSequence value;
@@ -430,10 +423,6 @@ public class SimpleMessageCodec
                 this.value = line.subSequence(i + 2, length);
                 return;
             }
-        }
-
-        public String toString() {
-            return Objects.toString(this);
         }
     }
 }

@@ -2,7 +2,7 @@ package com.kakapo.unity.message.client;
 
 public class RegisterMessage extends ClientMessage {
 
-    public static final String COMMAND = "Register";
+    public final String COMMAND = "Register";
     private final CharSequence _extension;
     private final CharSequence _group;
     private final boolean _override;

@@ -1,0 +1,5 @@
+Command: ListScheduledStatuses
+Extension: DRDCommunications8006@drd.co.uk
+Start: 2012-11-27:4:09:00:00
+End: 2013-11-27:4:09:00:00
+

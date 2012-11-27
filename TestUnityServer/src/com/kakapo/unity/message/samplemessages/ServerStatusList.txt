@@ -1,0 +1,5 @@
+Command: ServerStatusList
+Group: DRD Communication
+ExtensionStatus: DRDCommunications8005@drd.co.uk none
+ExtensionStatus: DRDCommunications8006@drd.co.uk none
+

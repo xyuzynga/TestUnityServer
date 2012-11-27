@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kakapo.unity.message.interserver;
 
 import com.kakapo.unity.message.peer.PeerMessage;
@@ -15,7 +11,7 @@ public class ServerIM extends InterServerMessage {
     /**
      * This filed represents type of the message which is InterServerMessage
      */
-    public static final String COMMAND = "ServerMessage";
+    public final String COMMAND = "ServerMessage";
     private final CharSequence _group;
     private final PeerMessage _peerMessage;
 
@@ -26,7 +22,7 @@ public class ServerIM extends InterServerMessage {
      * @param peerMessage - the message that has to be sent to the recipients
      */
     public ServerIM(CharSequence group, PeerMessage peerMessage) {
-        super(COMMAND);
+        super("ServerMessage");
         this._group = group;
         this._peerMessage = peerMessage;
     }

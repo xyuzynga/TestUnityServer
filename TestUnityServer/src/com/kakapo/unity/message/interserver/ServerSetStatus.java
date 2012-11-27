@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kakapo.unity.message.interserver;
 
 import com.kakapo.unity.message.ManualStatus;
@@ -19,7 +15,7 @@ public class ServerSetStatus extends InterServerMessage {
     /**
      * This filed represents type of the message which is ServerSetStatus
      */
-    public static final String COMMAND = "ServerSetStatus";
+    public final String COMMAND = "ServerSetStatus";
     private final String group;
     private final String extension;
     private final ManualStatus status;
@@ -34,7 +30,7 @@ public class ServerSetStatus extends InterServerMessage {
      * @param override
      */
     public ServerSetStatus(String group, String extension, String status, Date startDate, boolean override) {
-        super(COMMAND);
+        super("ServerSetStatus");
         this.group = group;
         this.extension = extension;
         this.status = new ManualStatus(status, startDate, override);

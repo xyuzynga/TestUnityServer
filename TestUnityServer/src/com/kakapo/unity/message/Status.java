@@ -1,6 +1,5 @@
 package com.kakapo.unity.message;
 
-import com.kakapo.unity.util.Objects;
 import java.util.Date;
 
 public abstract class Status {
@@ -22,10 +21,5 @@ public abstract class Status {
 
     public String getName() {
         return this.name;
-    }
-
-    @Override
-    public String toString() {
-        return Objects.toString(this);
     }
 }

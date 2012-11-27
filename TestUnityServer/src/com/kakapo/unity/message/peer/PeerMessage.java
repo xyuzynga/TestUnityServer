@@ -3,10 +3,6 @@ package com.kakapo.unity.message.peer;
 import com.kakapo.unity.message.Message;
 import java.util.Set;
 
-/**
- *
- * @author felix.vincent
- */
 public abstract class PeerMessage extends Message {
 
     private final Set<String> _extensions;

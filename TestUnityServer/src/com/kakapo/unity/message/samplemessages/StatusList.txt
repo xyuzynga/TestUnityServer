@@ -1,0 +1,3 @@
+Command: StatusList
+ExtensionStatus: DRDCommunications8006@drd.co.uk 9RayB6EWRVYqJhbfpo0nsAVW7bkgJp9fC61gwYTZdWtqKAsOtJntVQn13MeXeN4sEYiLOq8vmF2egF0JIQ5KfeAmz9RPHb3xWLIWqKVXWv0C6ugGNA3WFNcOU/NPs9s9m6G7CG8zfRZ7KeA1wj6jE39/+VbjKlrno6vWr3TEcA9TI7SPlo+Gpiufhlnakr/Ak4us3Kwte6c= 2012-11-27:04:06:06
+

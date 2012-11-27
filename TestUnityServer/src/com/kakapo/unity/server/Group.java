@@ -4,13 +4,15 @@ import com.kakapo.unity.connection.ConnectedClient;
 import com.kakapo.unity.message.server.error.OverrideMessage;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Group {
 
     private final String groupName;
-    private Map<String, ConnectedClient> objConnectedClientHashMap = new HashMap<>();
+    private Map<String, ConnectedClient> objConnectedClientHashMap = new ConcurrentHashMap<>();
 
     public Group(String groupName) {
         this.groupName = groupName;
@@ -37,16 +39,22 @@ public class Group {
     }
 
     public void addClient(String loginID, ConnectedClient client) {
-        //<<--Done-->>TODO - GK Add Client
-        ConnectedClient connectedClientWithSameLoginID=objConnectedClientHashMap.put(loginID, client);
-        if(connectedClientWithSameLoginID!=null)
-        {
-            connectedClientWithSameLoginID.receive(new OverrideMessage());
-            connectedClientWithSameLoginID.getObjConnectionStub().disconnect();
-        }              
+        //TODO - GK <Done> Add Client
+
+        ConnectedClient connectedClientWithSameLoginID = objConnectedClientHashMap.get(loginID);
+        if (connectedClientWithSameLoginID != null) {
+            try {
+                connectedClientWithSameLoginID.receive(new OverrideMessage());
+                objConnectedClientHashMap.remove(loginID);
+                Logger.getLogger(ConnectedClient.class.getName()).log(Level.FINE, "\n\ndisconnect() called from addClient()");
+            } catch (Exception e) {
+                System.out.println("EXCEPTION WHILE OVERRIDING " + e);
+            }
+        }
+
+        objConnectedClientHashMap.put(loginID, client);
     }
 
-   
     public boolean isEmpty() {
         return this.objConnectedClientHashMap.isEmpty();
     }

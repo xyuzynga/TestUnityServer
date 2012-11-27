@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kakapo.unity.message.interserver;
 
 /**
@@ -15,7 +11,7 @@ public class ServerRegisterMessage extends InterServerMessage {
     /**
      * This filed represents type of the message which is ServerRegister
      */
-    public static final String COMMAND = "ServerRegister";
+    public final String COMMAND = "ServerRegister";
     private final CharSequence serverName;
 
     /**
@@ -24,7 +20,7 @@ public class ServerRegisterMessage extends InterServerMessage {
      * @param serverName - name of the foreign server
      */
     public ServerRegisterMessage(CharSequence serverName) {
-        super(COMMAND);
+        super("ServerRegister");
         this.serverName = serverName;
     }
 

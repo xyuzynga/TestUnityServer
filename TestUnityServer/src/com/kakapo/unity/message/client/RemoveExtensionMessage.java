@@ -2,7 +2,7 @@ package com.kakapo.unity.message.client;
 
 public class RemoveExtensionMessage extends ClientMessage {
 
-    public static final String COMMAND = "RemoveExtension";
+    public final String COMMAND = "RemoveExtension";
     private final String extension;
 
     public RemoveExtensionMessage(String extension) {

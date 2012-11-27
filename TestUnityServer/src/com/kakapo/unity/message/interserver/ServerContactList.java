@@ -5,8 +5,6 @@
 package com.kakapo.unity.message.interserver;
 
 import com.kakapo.unity.message.ContactAction;
-import com.kakapo.unity.message.server.SingleItemSet;
-import java.util.Collection;
 
 /**
  * This class is to represent the objects of a ServerContactList message
@@ -21,7 +19,7 @@ public class ServerContactList extends InterServerMessage {
      * This field used to represent the type of the message which is
      * ServerContactList
      */
-    public static final String COMMAND = "ServerContactList";
+    public final String COMMAND = "ServerContactList";
     /**
      * This field is used to represent the group of the newly registered or
      * unregistered client as received from the InterServerMessage
@@ -49,7 +47,7 @@ public class ServerContactList extends InterServerMessage {
      * foreign IM&P Server
      */
     public ServerContactList(CharSequence group, ContactAction action) {
-        super(COMMAND);
+        super("ServerContactList");
         this.group = group;
         this._actions = action;
     }

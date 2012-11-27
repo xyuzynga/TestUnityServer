@@ -8,7 +8,7 @@ import java.util.List;
 
 public class StatusListMessage extends ServerMessage {
 
-    public static final String COMMAND = "StatusList";
+    public final String COMMAND = "StatusList";
     private List<ExtensionStatus> statuses = new ArrayList<ExtensionStatus>();
 
     public StatusListMessage() {

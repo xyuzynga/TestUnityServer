@@ -5,7 +5,7 @@ import java.util.Collection;
 
 public class ContactListMessage extends ServerMessage {
 
-    public static final String COMMAND = "ContactList";
+    public final String COMMAND = "ContactList";
     private final Collection<ContactAction> _actions;
 
     public ContactListMessage(Collection<ContactAction> actions) {
@@ -14,7 +14,7 @@ public class ContactListMessage extends ServerMessage {
     }
 
     public ContactListMessage(ContactAction action) {
-        this(new SingleItemSet<ContactAction>(action));
+        this(new SingleItemSet<>(action));
     }
 
     public Collection<ContactAction> getActions() {

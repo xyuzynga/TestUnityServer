@@ -8,7 +8,7 @@ public abstract interface MessageCodec {
 
     public abstract DecodeResult decode(CharSequence paramCharSequence);
 
-    public static class DecodeResult {
+    public class DecodeResult {
 
         public Message message;
         public int chars;

@@ -29,7 +29,7 @@ public class ContactAction {
         return _product;
     }
 
-    public static enum Action {
+    public enum Action {
 
         ADD, REMOVE;
     }

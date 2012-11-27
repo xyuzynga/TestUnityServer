@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class SetStatusMessage extends ClientMessage {
 
-    public static final String COMMAND = "SetStatus";
+    public final String COMMAND = "SetStatus";
     private final ManualStatus status;
     private final String extension;
 
