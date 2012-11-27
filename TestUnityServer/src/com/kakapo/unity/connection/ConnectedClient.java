@@ -6,19 +6,12 @@ import com.kakapo.unity.message.peer.PeerMessage;
 import com.kakapo.unity.message.server.ServerMessage;
 import com.kakapo.unity.message.server.error.ErrorMessage;
 import com.kakapo.unity.server.UnityIMPServer;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import com.kakapo.unity.server.cryptography.DESEncryptor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 public class ConnectedClient {
 
@@ -64,29 +57,6 @@ public class ConnectedClient {
 //        throw new UnsupportedOperationException("Not yet implemented send(ClientMessage message)");
     }
 
-    private String DesEncryption(byte[] clientUserId) {
-        // Aj
-        String serverCheckSum = "";
-        try {
-            byte[] password = "password".getBytes();
-            SecretKey secretKey = new SecretKeySpec(password, "DES");
-            Cipher desCipher = Cipher.getInstance("DES");
-            desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            byte[] textEncrypted = desCipher.doFinal(clientUserId);
-            serverCheckSum = new String(textEncrypted);
-            password = null;
-            textEncrypted = null;
-            secretKey = null;
-            desCipher = null;
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-            //Logg INVALID DES KEY
-            Logger.getLogger(ConnectedClient.class.getName()).log(Level.SEVERE, "In DesEncryption()", e);
-            serverCheckSum = "ErRor";
-        }
-        clientUserId = null;
-        return serverCheckSum;
-    }
-
     public boolean checkBlackListMessageFrequency(String userId) {
         try {
             UnityIMPServer server;
@@ -115,7 +85,7 @@ public class ConnectedClient {
         ConnectionStub connectionStub = (ConnectionStub) objConnectionStub;
         server = (UnityIMPServer) connectionStub.getServer();
         String userId = ((ConnectionStub) (this.objConnectionStub)).getLoginIdOrServerName().toString();
-        String serverCheckSum = DesEncryption(userId.getBytes());
+        String serverCheckSum = new DESEncryptor().DesEncryption(userId.getBytes());
         ResultSet rs = null;
         if (serverCheckSum.equals(checkSum)) {
             try {
