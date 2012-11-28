@@ -19,9 +19,10 @@ public abstract class PeerMessage extends Message {
     }
 
     public Set<String> getExtensions() {
-        Set<String> copyOfExtensions = null;
-        copyOfExtensions.addAll(this._extensions);
-        return copyOfExtensions;
+//        Set<String> copyOfExtensions = null;
+//        copyOfExtensions.addAll(this._extensions);
+//        return copyOfExtensions;
+        return this._extensions;
     }
 
     public CharSequence getInput() {
