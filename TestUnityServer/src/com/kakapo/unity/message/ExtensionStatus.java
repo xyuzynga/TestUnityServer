@@ -29,4 +29,9 @@ public class ExtensionStatus {
     public Date getSince() {
         return this.since;
     }
+
+    @Override
+    public String toString() {
+        return "ExtensionStatus{" + "extension=" + extension + ", status=" + status + ", since=" + since + '}';
+    }
 }

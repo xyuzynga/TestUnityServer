@@ -223,13 +223,13 @@ public class LegacyPatternCodec
                         result = new InternalErrorMessage();
                         break;
                     case 2:
-                      //  result = new MaxConnectionsMessage(readProperty("RedirectHostName", lines).toString());
+                        //  result = new MaxConnectionsMessage(readProperty("RedirectHostName", lines).toString());
                         break;
                     case 3:
-                    //    result = new MaxConnectionsMessage();
+                        //    result = new MaxConnectionsMessage();
                         break;
                     case 5:
-                      //  result = new ExtensionInUseMessage();
+                        //  result = new ExtensionInUseMessage();
                         break;
                     case 6:
                         result = new OverrideMessage();
@@ -354,8 +354,8 @@ public class LegacyPatternCodec
 
     private boolean checkMessageEnd(LineReader lines) {
         if (lines.hasNext()) {
-           CharSequence line = lines.next();          
-            if (line.length() > 0) {               
+            CharSequence line = lines.next();
+            if (line.length() > 0) {
                 throw new IllegalStateException(new StringBuilder().append("Found extra line at end of message: ").append(line.toString()).toString());
             }
             return true;
@@ -368,7 +368,7 @@ public class LegacyPatternCodec
 
         CharSequence sequence = input.subSequence(lines.position(), lines.position() + length);
 
-        lines.position(lines.position() + length);       
+        lines.position(lines.position() + length);
         lines.next();
         return sequence;
     }
@@ -516,7 +516,7 @@ public class LegacyPatternCodec
                 ContactAction action = scl.getActions();
                 String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
                 if (action.getProduct() != null) {
-                    appendProperty(name, action.getExtension() + (action.getProduct().contentEquals("none") ? "":" " + action.getProduct()), output);
+                    appendProperty(name, action.getExtension() + (action.getProduct().contentEquals("none") ? "" : " " + action.getProduct()), output);
                 } else {
                     appendProperty(name, action.getExtension(), output);
                 }
@@ -586,6 +586,336 @@ public class LegacyPatternCodec
 
 
 
+    }
+
+    synchronized void encodeKemp1(Message message, Appendable original) {
+
+        Appendable output = original;
+
+        if ((message instanceof KeepAliveMessage)) {
+            appendProperty("Command", message.getCommand(), output);
+        } else if ((message instanceof ContactListMessage)) {
+            ContactListMessage clm = (ContactListMessage) message;
+            Collection<ContactAction> actions = clm.getActions();
+            appendProperty("Command", clm.getCommand(), output);
+            for (ContactAction action : actions) {
+                String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof ContactList2Message)) {
+            appendProperty("Command", "ContactList", output);
+            ContactList2Message clm2 = (ContactList2Message) message;
+            for (ContactAction action : clm2.getActions()) {
+                String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof TextMessage)) {
+            TextMessage tm = (TextMessage) message;
+            appendProperty("Command", tm.getCommand(), output);
+            appendProperty("Id", tm.getId(), output);
+            appendProperty("Sender", tm.getSender(), output);
+            appendProperty("Share", Boolean.toString(tm.isShare()), output);
+            writeExtensions(tm.getExtensions(), output);
+            appendFreeText(tm.getText(), output, tm.getLength());
+        } else if ((message instanceof TextMessage2)) {
+            TextMessage2 tm2 = (TextMessage2) message;
+            appendProperty("Command", "Message", output);
+            appendProperty("Id", tm2.getId(), output);
+            appendProperty("Sender", tm2.getSender(), output);
+            appendProperty("Share", "true", output);
+            writeExtensions(tm2.getExtensions(), output);
+            appendFreeText(tm2.getText(), output, tm2.getLength());
+        } else if ((message instanceof CustomMessage)) {
+            CustomMessage cm = (CustomMessage) message;
+            appendProperty("Command", cm.getCommand(), output);
+            appendProperty("Id", cm.getId(), output);
+            appendProperty("Sender", cm.getSender(), output);
+            appendProperty("Share", "true", output);
+            writeExtensions(cm.getExtensions(), output);
+            appendFreeText(cm.getText(), output, cm.getLength());
+        } else if ((message instanceof ErrorMessage)) {
+            ErrorMessage em = (ErrorMessage) message;
+            appendProperty("Command", em.getCommand(), output);
+            appendProperty("Number", Integer.toString(em.getNumber()), output);
+            appendProperty("Description", this._messages.getString(em.getKey()), output);
+            appendProperty("AlertUser", Boolean.toString(em.isAlert()), output);
+        } else if ((message instanceof StatusListMessage)) {
+            StatusListMessage slm = (StatusListMessage) message;
+            appendProperty("Command", slm.getCommand(), output);
+            for (ExtensionStatus es : slm.getStatuses()) {
+                appendProperty("ExtensionStatus", new StringBuilder().append(es.getExtension()).append(" ").append(es.getStatus() == null ? DEFAULT_STATUS : new StringBuilder().append(es.getStatus()).append(" ").append(this.dateFormat.format(es.getSince())).toString()).toString(), output);
+            }
+        } else if ((message instanceof ScheduledStatusListMessage)) {
+            ScheduledStatusListMessage sslm = (ScheduledStatusListMessage) message;
+            appendProperty("Command", sslm.getCommand(), output);
+            for (ScheduledStatus ss : sslm.getStatuses()) {
+                appendProperty("ScheduledStatus", new StringBuilder().append(ss.getName()).append(" ").append(ss.getId()).append(" ").append(this.dateFormat.format(ss.getStart())).append(" ").append(this.dateFormat.format(ss.getEnd())).toString(), output);
+            }
+        } else if ((message instanceof ServerRegisterMessage)) {
+            ServerRegisterMessage srm = (ServerRegisterMessage) message;
+            appendProperty("Command", srm.getCommand(), output);
+            appendProperty("ServerName", srm.getServerName(), output);
+        } else if ((message instanceof ServerContactList)) {
+            ServerContactList scl = (ServerContactList) message;
+            appendProperty("Command", scl.getCommand(), output);
+            appendProperty("Group", scl.getGroup(), output);
+            ContactAction action = scl.getActions();
+            String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+            if (action.getProduct() != null) {
+                appendProperty(name, action.getExtension() + (action.getProduct().contentEquals("none") ? "" : " " + action.getProduct()), output);
+            } else {
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof ServerIM)) {
+            ServerIM sim = (ServerIM) message;
+            appendProperty("Command", sim.getCommand(), output);
+            appendProperty("Group", sim.getGroup(), output);
+            if (((ServerIM) message).getPeerMessage() instanceof TextMessage2) {
+                TextMessage2 tm2 = (TextMessage2) sim.getPeerMessage();
+                appendProperty("Command", tm2.getCommand(), output);
+                appendProperty("Id", tm2.getId(), output);
+                appendProperty("Sender", tm2.getSender(), output);
+                appendProperty("DateTime", tm2.getDateTime(), output);
+                writeExtensions(tm2.getExtensions(), output);
+                appendFreeText(tm2.getText(), output, tm2.getLength());
+            } else if (((ServerIM) message).getPeerMessage() instanceof TextMessage) {
+                TextMessage tm = (TextMessage) sim.getPeerMessage();
+                appendProperty("Command", tm.getCommand(), output);
+                appendProperty("Id", tm.getId(), output);
+                appendProperty("Sender", tm.getSender(), output);
+                appendProperty("Share", Boolean.toString(tm.isShare()), output);
+                writeExtensions(tm.getExtensions(), output);
+                appendFreeText(tm.getText(), output, tm.getLength());
+            } else if (((ServerIM) message).getPeerMessage() instanceof CustomMessage) {
+                CustomMessage cm = (CustomMessage) sim.getPeerMessage();
+                appendProperty("Command", cm.getCommand(), output);
+                appendProperty("Id", cm.getId(), output);
+                appendProperty("Sender", cm.getSender(), output);
+                appendProperty("DateTime", cm.getDateTime(), output);
+                writeExtensions(cm.getExtensions(), output);
+                appendFreeText(cm.getText(), output, cm.getLength());
+            }
+        } else if ((message instanceof ServerStatusListMessage)) {
+            ServerStatusListMessage sslm = (ServerStatusListMessage) message;
+            appendProperty("Command", sslm.getCommand(), output);
+            appendProperty("Group", sslm.getGroup(), output);
+            for (ExtensionStatus es : sslm.getStatuses()) {
+                appendProperty("ExtensionStatus", new StringBuilder().append(es.getExtension()).append(" ").append(es.getStatus() == null ? DEFAULT_STATUS : new StringBuilder().append(es.getStatus()).append(" ").append(this.dateFormat.format(es.getSince())).toString()).toString(), output);
+            }
+        } else if ((message instanceof ServerSetStatus)) {
+            ServerSetStatus sss = (ServerSetStatus) message;
+            appendProperty("Command", sss.getCommand(), output);
+            appendProperty("Group", sss.getGroup(), output);
+            appendProperty("ExtensionStatus", new StringBuilder().append(sss.getExtension()).append(" ").append(sss.getStatus().getName()).append(" ").append(this.dateFormat.format(sss.getStatus().getStart())), output);
+            appendProperty("Override", Boolean.toString(sss.getStatus().isOverride()), output);
+        } else {
+            throw new RuntimeException(new StringBuilder().append("Could not identify as KEMP1 encoded Legacy Client message ").append(message).toString());
+        }
+        try {
+            output.append('\n');
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    synchronized void encodeKemp2(Message message, Appendable original) {
+        Appendable output = original;
+
+        if ((message instanceof KeepAliveMessage)) {
+            appendProperty("Command", message.getCommand(), output);
+        } else if ((message instanceof ContactListMessage)) {
+            ContactListMessage clm = (ContactListMessage) message;
+            Collection<ContactAction> actions = clm.getActions();
+            appendProperty("Command", clm.getCommand(), output);
+            for (ContactAction action : actions) {
+                String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof ContactList2Message)) {
+            appendProperty("Command", "ContactList", output);
+            ContactList2Message clm2 = (ContactList2Message) message;
+            for (ContactAction action : clm2.getActions()) {
+                String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof TextMessage)) {
+            TextMessage tm = (TextMessage) message;
+            appendProperty("Command", tm.getCommand(), output);
+            appendProperty("Id", tm.getId(), output);
+            appendProperty("Sender", tm.getSender(), output);
+            appendProperty("Share", Boolean.toString(tm.isShare()), output);
+            writeExtensions(tm.getExtensions(), output);
+            appendFreeText(tm.getText(), output, tm.getLength());
+        } else if ((message instanceof TextMessage2)) {
+            TextMessage2 tm2 = (TextMessage2) message;
+            appendProperty("Command", "Message", output);
+            appendProperty("Id", tm2.getId(), output);
+            appendProperty("Sender", tm2.getSender(), output);
+            appendProperty("Share", "true", output);
+            writeExtensions(tm2.getExtensions(), output);
+            appendFreeText(tm2.getText(), output, tm2.getLength());
+        } else if ((message instanceof CustomMessage)) {
+            CustomMessage cm = (CustomMessage) message;
+            appendProperty("Command", cm.getCommand(), output);
+            appendProperty("Id", cm.getId(), output);
+            appendProperty("Sender", cm.getSender(), output);
+            appendProperty("Share", "true", output);
+            writeExtensions(cm.getExtensions(), output);
+            appendFreeText(cm.getText(), output, cm.getLength());
+        } else if ((message instanceof ErrorMessage)) {
+            ErrorMessage em = (ErrorMessage) message;
+            appendProperty("Command", em.getCommand(), output);
+            appendProperty("Number", Integer.toString(em.getNumber()), output);
+            appendProperty("Description", this._messages.getString(em.getKey()), output);
+            appendProperty("AlertUser", Boolean.toString(em.isAlert()), output);
+        } else if ((message instanceof StatusListMessage)) {
+            StatusListMessage slm = (StatusListMessage) message;
+            appendProperty("Command", slm.getCommand(), output);
+            for (ExtensionStatus es : slm.getStatuses()) {
+                appendProperty("ExtensionStatus", new StringBuilder().append(es.getExtension()).append(" ").append(es.getStatus() == null ? DEFAULT_STATUS : new StringBuilder().append(es.getStatus()).append(" ").append(this.dateFormat.format(es.getSince())).toString()).toString(), output);
+            }
+        } else if ((message instanceof ScheduledStatusListMessage)) {
+            ScheduledStatusListMessage sslm = (ScheduledStatusListMessage) message;
+            appendProperty("Command", sslm.getCommand(), output);
+            for (ScheduledStatus ss : sslm.getStatuses()) {
+                appendProperty("ScheduledStatus", new StringBuilder().append(ss.getName()).append(" ").append(ss.getId()).append(" ").append(this.dateFormat.format(ss.getStart())).append(" ").append(this.dateFormat.format(ss.getEnd())).toString(), output);
+            }
+        } else if ((message instanceof ServerRegisterMessage)) {
+            ServerRegisterMessage srm = (ServerRegisterMessage) message;
+            appendProperty("Command", srm.getCommand(), output);
+            appendProperty("ServerName", srm.getServerName(), output);
+        } else if ((message instanceof ServerContactList)) {
+            ServerContactList scl = (ServerContactList) message;
+            appendProperty("Command", scl.getCommand(), output);
+            appendProperty("Group", scl.getGroup(), output);
+            ContactAction action = scl.getActions();
+            String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+            if (action.getProduct() != null) {
+                appendProperty(name, action.getExtension() + (action.getProduct().contentEquals("none") ? "" : " " + action.getProduct()), output);
+            } else {
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof ServerIM)) {
+            ServerIM sim = (ServerIM) message;
+            appendProperty("Command", sim.getCommand(), output);
+            appendProperty("Group", sim.getGroup(), output);
+            if (((ServerIM) message).getPeerMessage() instanceof TextMessage2) {
+                TextMessage2 tm2 = (TextMessage2) sim.getPeerMessage();
+                appendProperty("Command", tm2.getCommand(), output);
+                appendProperty("Id", tm2.getId(), output);
+                appendProperty("Sender", tm2.getSender(), output);
+                appendProperty("DateTime", tm2.getDateTime(), output);
+                writeExtensions(tm2.getExtensions(), output);
+                appendFreeText(tm2.getText(), output, tm2.getLength());
+            } else if (((ServerIM) message).getPeerMessage() instanceof TextMessage) {
+                TextMessage tm = (TextMessage) sim.getPeerMessage();
+                appendProperty("Command", tm.getCommand(), output);
+                appendProperty("Id", tm.getId(), output);
+                appendProperty("Sender", tm.getSender(), output);
+                appendProperty("Share", Boolean.toString(tm.isShare()), output);
+                writeExtensions(tm.getExtensions(), output);
+                appendFreeText(tm.getText(), output, tm.getLength());
+            } else if (((ServerIM) message).getPeerMessage() instanceof CustomMessage) {
+                CustomMessage cm = (CustomMessage) sim.getPeerMessage();
+                appendProperty("Command", cm.getCommand(), output);
+                appendProperty("Id", cm.getId(), output);
+                appendProperty("Sender", cm.getSender(), output);
+                appendProperty("DateTime", cm.getDateTime(), output);
+                writeExtensions(cm.getExtensions(), output);
+                appendFreeText(cm.getText(), output, cm.getLength());
+            }
+        } else if ((message instanceof ServerStatusListMessage)) {
+            ServerStatusListMessage sslm = (ServerStatusListMessage) message;
+            appendProperty("Command", sslm.getCommand(), output);
+            appendProperty("Group", sslm.getGroup(), output);
+            for (ExtensionStatus es : sslm.getStatuses()) {
+                appendProperty("ExtensionStatus", new StringBuilder().append(es.getExtension()).append(" ").append(es.getStatus() == null ? DEFAULT_STATUS : new StringBuilder().append(es.getStatus()).append(" ").append(this.dateFormat.format(es.getSince())).toString()).toString(), output);
+            }
+        } else if ((message instanceof ServerSetStatus)) {
+            ServerSetStatus sss = (ServerSetStatus) message;
+            appendProperty("Command", sss.getCommand(), output);
+            appendProperty("Group", sss.getGroup(), output);
+            appendProperty("ExtensionStatus", new StringBuilder().append(sss.getExtension()).append(" ").append(sss.getStatus().getName()).append(" ").append(this.dateFormat.format(sss.getStatus().getStart())), output);
+            appendProperty("Override", Boolean.toString(sss.getStatus().isOverride()), output);
+        } else {
+            throw new RuntimeException(new StringBuilder().append("Could not identify as KEMP1/KEMP2 encoded New Client message ").append(message).toString());
+        }
+        try {
+            output.append('\n');
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    synchronized void encodeServer(Message message, Appendable original) {
+        Appendable output = original;
+        if ((message instanceof KeepAliveMessage)) {
+            appendProperty("Command", message.getCommand(), output);
+        } else if ((message instanceof ServerRegisterMessage)) {
+            ServerRegisterMessage srm = (ServerRegisterMessage) message;
+            appendProperty("Command", srm.getCommand(), output);
+            appendProperty("ServerName", srm.getServerName(), output);
+        } else if ((message instanceof ServerContactList)) {
+            ServerContactList scl = (ServerContactList) message;
+            appendProperty("Command", scl.getCommand(), output);
+            appendProperty("Group", scl.getGroup(), output);
+            ContactAction action = scl.getActions();
+            String name = action.getAction().equals(ContactAction.Action.ADD) ? "Add-Contact" : "Remove-Contact";
+            if (action.getProduct() != null) {
+                appendProperty(name, action.getExtension() + (action.getProduct().contentEquals("none") ? "" : " " + action.getProduct()), output);
+            } else {
+                appendProperty(name, action.getExtension(), output);
+            }
+        } else if ((message instanceof ServerIM)) {
+            ServerIM sim = (ServerIM) message;
+            appendProperty("Command", sim.getCommand(), output);
+            appendProperty("Group", sim.getGroup(), output);
+            if (((ServerIM) message).getPeerMessage() instanceof TextMessage2) {
+                TextMessage2 tm2 = (TextMessage2) sim.getPeerMessage();
+                appendProperty("Command", tm2.getCommand(), output);
+                appendProperty("Id", tm2.getId(), output);
+                appendProperty("Sender", tm2.getSender(), output);
+                appendProperty("DateTime", tm2.getDateTime(), output);
+                writeExtensions(tm2.getExtensions(), output);
+                appendFreeText(tm2.getText(), output, tm2.getLength());
+            } else if (((ServerIM) message).getPeerMessage() instanceof TextMessage) {
+                TextMessage tm = (TextMessage) sim.getPeerMessage();
+                appendProperty("Command", tm.getCommand(), output);
+                appendProperty("Id", tm.getId(), output);
+                appendProperty("Sender", tm.getSender(), output);
+                appendProperty("Share", Boolean.toString(tm.isShare()), output);
+                writeExtensions(tm.getExtensions(), output);
+                appendFreeText(tm.getText(), output, tm.getLength());
+            } else if (((ServerIM) message).getPeerMessage() instanceof CustomMessage) {
+                CustomMessage cm = (CustomMessage) sim.getPeerMessage();
+                appendProperty("Command", cm.getCommand(), output);
+                appendProperty("Id", cm.getId(), output);
+                appendProperty("Sender", cm.getSender(), output);
+                appendProperty("DateTime", cm.getDateTime(), output);
+                writeExtensions(cm.getExtensions(), output);
+                appendFreeText(cm.getText(), output, cm.getLength());
+            }
+        } else if ((message instanceof ServerStatusListMessage)) {
+            ServerStatusListMessage sslm = (ServerStatusListMessage) message;
+            appendProperty("Command", sslm.getCommand(), output);
+            appendProperty("Group", sslm.getGroup(), output);
+            for (ExtensionStatus es : sslm.getStatuses()) {
+                appendProperty("ExtensionStatus", new StringBuilder().append(es.getExtension()).append(" ").append(es.getStatus() == null ? DEFAULT_STATUS : new StringBuilder().append(es.getStatus()).append(" ").append(this.dateFormat.format(es.getSince())).toString()).toString(), output);
+            }
+        } else if ((message instanceof ServerSetStatus)) {
+            ServerSetStatus sss = (ServerSetStatus) message;
+            appendProperty("Command", sss.getCommand(), output);
+            appendProperty("Group", sss.getGroup(), output);
+            appendProperty("ExtensionStatus", new StringBuilder().append(sss.getExtension()).append(" ").append(sss.getStatus().getName()).append(" ").append(this.dateFormat.format(sss.getStatus().getStart())), output);
+            appendProperty("Override", Boolean.toString(sss.getStatus().isOverride()), output);
+        } else {
+            throw new RuntimeException(new StringBuilder().append("Could not identify as KEMP2 encoded InterServer message ").append(message).toString());
+        }
+        try {
+            output.append('\n');
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void appendFreeText(CharSequence text, Appendable output, int length) {

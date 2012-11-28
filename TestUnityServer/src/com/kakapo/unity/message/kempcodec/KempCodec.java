@@ -20,6 +20,50 @@ public class KempCodec {
     private final AppendableBuffers _output = new AppendableBuffers(objByteBufferPool);
     private final BufferCharSequence messageCharSequence = new BufferCharSequence();
 
+    public static void main(String[] args) {
+        KempCodec objKempCodec = new KempCodec();
+        objKempCodec.testMessageCodec();
+    }
+
+    private void testMessageCodec() {
+        try {
+
+            String messageTemplate = "StatusList";
+
+            int ch;
+            StringBuilder strContent = new StringBuilder("");
+            try {
+                FileInputStream fis = new FileInputStream("src/com/kakapo/unity/message/samplemessages/" + messageTemplate + ".txt");
+                while ((ch = fis.read()) != -1) {
+                    strContent.append((char) ch);
+                }
+                fis.close();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+            ByteBuffer bbf = ByteBuffer.wrap((strContent.toString()).getBytes());
+            Message messageObj = decode(bbf);
+            System.out.println("messageObj = " + messageObj);
+//***********************************************************************************************************
+            ByteBuffer[] bba = kemp1Encode(messageObj);
+
+            Charset charset = Charset.forName("UTF-8");
+            CharsetDecoder decoder = charset.newDecoder();
+
+            String data = "";
+            for (ByteBuffer byteBuffer : bba) {
+                int old_position = byteBuffer.position();
+                data = decoder.decode(byteBuffer).toString();
+                // reset buffer's position to its original so it is not altered:
+                System.out.print(data);
+                byteBuffer.position(old_position);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(KempCodec.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public MessageCodec getMessageCodec() {
         return messageCodec;
     }
@@ -30,6 +74,7 @@ public class KempCodec {
             MessageCodec.DecodeResult dr;
             messageCharSequence.addBuffer(_input);
             dr = messageCodec.decode(messageCharSequence);
+            _input.clear();
             return dr.message;
         } catch (Exception ex) {
             Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!", ex);
@@ -46,15 +91,17 @@ public class KempCodec {
     }
 
     public ByteBuffer[] kemp1Encode(Message messageObj) throws Exception {
-        this.messageCodec.encode(messageObj, this._output);
+        ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
         return this._output.getBuffersForReading();
     }
 
-    public CharSequence kemp2Encode(Message messageObj) throws Exception {
-        throw new UnsupportedOperationException("Method kemp2Encode(Message messageObj) not yet implemented");
+    public ByteBuffer[] kemp2Encode(Message messageObj) throws Exception {
+         ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
+        return this._output.getBuffersForReading();
     }
 
-    public CharSequence serverEncode(Message messageObj) throws Exception {
-        throw new UnsupportedOperationException("Method serverEncode(Message messageObj) not yet implemented");
+    public ByteBuffer[] serverEncode(Message messageObj) throws Exception {
+         ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
+        return this._output.getBuffersForReading();
     }
 }

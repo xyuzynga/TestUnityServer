@@ -35,4 +35,9 @@ public class RegisterMessage2 extends ClientMessage {
     public CharSequence getProductName() {
         return _productName;
     }
+
+    @Override
+    public String toString() {
+        return "RegisterMessage2{" + "COMMAND=" + COMMAND + ", _loginID=" + _loginID + ", _checkSum=" + _checkSum + ", _group=" + _group + ", _productName=" + _productName + '}';
+    }
 }

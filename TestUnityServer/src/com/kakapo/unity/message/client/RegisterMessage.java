@@ -28,6 +28,6 @@ public class RegisterMessage extends ClientMessage {
 
     @Override
     public String toString() {
-        return "RegisterMessage{" + "_extension=" + _extension + ", _group=" + _group + ", _override=" + _override + '}';
+        return "RegisterMessage{" + "COMMAND=" + COMMAND + ", _extension=" + _extension + ", _group=" + _group + ", _override=" + _override + '}';
     }
 }

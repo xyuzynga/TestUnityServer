@@ -30,4 +30,9 @@ public class StatusListMessage extends ServerMessage {
     public void setStatuses(List<ExtensionStatus> statuses) {
         this.statuses = statuses;
     }
+
+    @Override
+    public String toString() {
+        return "StatusListMessage{" + "COMMAND=" + COMMAND + ", statuses=" + statuses + '}';
+    }
 }
