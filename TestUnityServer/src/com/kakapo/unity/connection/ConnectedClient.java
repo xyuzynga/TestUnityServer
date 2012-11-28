@@ -85,7 +85,7 @@ public class ConnectedClient {
         ConnectionStub connectionStub = (ConnectionStub) objConnectionStub;
         server = (UnityIMPServer) connectionStub.getServer();
         String userId = ((ConnectionStub) (this.objConnectionStub)).getLoginIdOrServerName().toString();
-        String serverCheckSum = new DESEncryptor().DesEncryption(userId.getBytes());
+        String serverCheckSum = new DESEncryptor().computeCheckSum(userId);
         ResultSet rs = null;
         if (serverCheckSum.equals(checkSum)) {
             try {
