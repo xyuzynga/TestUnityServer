@@ -20,50 +20,7 @@ public class KempCodec {
     private final AppendableBuffers _output = new AppendableBuffers(objByteBufferPool);
     private final BufferCharSequence messageCharSequence = new BufferCharSequence();
 
-    public static void main(String[] args) {
-        KempCodec objKempCodec = new KempCodec();
-        objKempCodec.testMessageCodec();
-    }
-
-    private void testMessageCodec() {
-        try {
-
-            String messageTemplate = "StatusList";
-
-            int ch;
-            StringBuilder strContent = new StringBuilder("");
-            try {
-                FileInputStream fis = new FileInputStream("src/com/kakapo/unity/message/samplemessages/" + messageTemplate + ".txt");
-                while ((ch = fis.read()) != -1) {
-                    strContent.append((char) ch);
-                }
-                fis.close();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-
-            ByteBuffer bbf = ByteBuffer.wrap((strContent.toString()).getBytes());
-            Message messageObj = decode(bbf);
-            System.out.println("messageObj = " + messageObj);
-//***********************************************************************************************************
-            ByteBuffer[] bba = kemp1Encode(messageObj);
-
-            Charset charset = Charset.forName("UTF-8");
-            CharsetDecoder decoder = charset.newDecoder();
-
-            String data = "";
-            for (ByteBuffer byteBuffer : bba) {
-                int old_position = byteBuffer.position();
-                data = decoder.decode(byteBuffer).toString();
-                // reset buffer's position to its original so it is not altered:
-                System.out.print(data);
-                byteBuffer.position(old_position);
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(KempCodec.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
+    
     public MessageCodec getMessageCodec() {
         return messageCodec;
     }
@@ -77,7 +34,7 @@ public class KempCodec {
             _input.clear();
             return dr.message;
         } catch (Exception ex) {
-            Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!", ex);
+            Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!{0}", ex);
             return null;
         } finally {
             objByteBufferPool.returnByteBuffer(_input);

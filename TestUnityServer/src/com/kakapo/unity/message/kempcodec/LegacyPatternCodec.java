@@ -42,6 +42,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -566,26 +567,9 @@ public class LegacyPatternCodec
         try {
             output.append('\n');
         } catch (IOException e) {
+            Logger.getLogger(this.getClass().toString()).log(Level.CONFIG, "Could not append \\n \n{0}", e);
             throw new RuntimeException(e);
         }
-
-
-//    if (logger.isLoggable(Level.FINE))
-//    {
-//        System.out.println("Logging .............");
-//      logger.fine(output.toString());
-//      try
-//      {
-//        original.append(output.toString());
-//      }
-//      catch (IOException e)
-//      {
-//        throw new RuntimeException(e);
-//      }
-//    }
-
-
-
     }
 
     synchronized void encodeKemp1(Message message, Appendable original) {
