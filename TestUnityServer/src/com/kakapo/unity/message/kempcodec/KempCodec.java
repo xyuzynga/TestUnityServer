@@ -5,10 +5,7 @@ import com.kakapo.unity.network.AppendableBuffers;
 import com.kakapo.unity.network.BufferCharSequence;
 import com.kakapo.unity.network.ByteBufferFactory;
 import com.kakapo.unity.network.ByteBufferPool;
-import java.io.FileInputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,13 +49,34 @@ public class KempCodec {
         return this._output.getBuffersForReading();
     }
 
+    public ByteBuffer[] kemp1Encode(Message[] messageArrayObj) throws Exception {
+        for (Message messageObj : messageArrayObj) {
+            ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
+        }
+        return this._output.getBuffersForReading();
+    }
+    
     public ByteBuffer[] kemp2Encode(Message messageObj) throws Exception {
-         ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
+         ((LegacyPatternCodec)this.messageCodec).encodeKemp2(messageObj, this._output);
         return this._output.getBuffersForReading();
     }
 
+    public ByteBuffer[] kemp2Encode(Message[] messageArrayObj) throws Exception {
+        for (Message messageObj : messageArrayObj) {
+            ((LegacyPatternCodec)this.messageCodec).encodeKemp2(messageObj, this._output);
+        }
+        return this._output.getBuffersForReading();
+    }
+    
     public ByteBuffer[] serverEncode(Message messageObj) throws Exception {
-         ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
+         ((LegacyPatternCodec)this.messageCodec).encodeServer(messageObj, this._output);
+        return this._output.getBuffersForReading();
+    }
+    
+    public ByteBuffer[] serverEncode(Message[] messageArrayObj) throws Exception {
+        for (Message messageObj : messageArrayObj) {
+            ((LegacyPatternCodec)this.messageCodec).encodeServer(messageObj, this._output);
+        }
         return this._output.getBuffersForReading();
     }
 }

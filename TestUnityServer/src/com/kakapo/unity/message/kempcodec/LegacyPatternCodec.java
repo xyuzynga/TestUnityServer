@@ -398,14 +398,9 @@ public class LegacyPatternCodec
     }
 
     @Override
-    public synchronized void encode(Message message, Appendable original) {
-        Appendable output = original;
+    public synchronized void encode(Message message, Appendable output) {
+//        Appendable output = original;
 
-//
-//    if (logger.isLoggable(Level.FINE))
-//    { 
-//      output = new StringBuilder();
-//    }   
         appendProperty("Command", message.getCommand(), output);
 
         if (!(message instanceof KeepAliveMessage)) {
@@ -572,9 +567,9 @@ public class LegacyPatternCodec
         }
     }
 
-    synchronized void encodeKemp1(Message message, Appendable original) {
+    synchronized void encodeKemp1(Message message, Appendable output) {
 
-        Appendable output = original;
+//        Appendable output = original;
 
         if ((message instanceof KeepAliveMessage)) {
             appendProperty("Command", message.getCommand(), output);
@@ -702,8 +697,8 @@ public class LegacyPatternCodec
         }
     }
 
-    synchronized void encodeKemp2(Message message, Appendable original) {
-        Appendable output = original;
+    synchronized void encodeKemp2(Message message, Appendable output) {
+//        Appendable output = original;
 
         if ((message instanceof KeepAliveMessage)) {
             appendProperty("Command", message.getCommand(), output);
@@ -831,8 +826,8 @@ public class LegacyPatternCodec
         }
     }
 
-    synchronized void encodeServer(Message message, Appendable original) {
-        Appendable output = original;
+    synchronized void encodeServer(Message message, Appendable output) {
+//        Appendable output = original;
         if ((message instanceof KeepAliveMessage)) {
             appendProperty("Command", message.getCommand(), output);
         } else if ((message instanceof ServerRegisterMessage)) {
