@@ -50,6 +50,9 @@ public final class DESEncryptor {
             //Logg INVALID DES KEY
             Logger.getLogger(DESEncryptor.class.getName()).log(Level.SEVERE, "Error while computing CheckSum! ", e);
             serverCheckSum = "CHECKSUM IS INVALID";
+        } catch (NullPointerException e) {
+            Logger.getLogger(DESEncryptor.class.getName()).log(Level.SEVERE, "Error while computing CheckSum! ", e);
+            serverCheckSum = "CHECKSUM IS INVALID";
         }
         loginId = null;
         return serverCheckSum;
