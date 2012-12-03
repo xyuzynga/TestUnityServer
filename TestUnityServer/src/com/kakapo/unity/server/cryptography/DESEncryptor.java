@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kakapo.unity.server.cryptography;
 
-import java.io.UnsupportedEncodingException;
+import com.kakapo.unity.server.cryptography.misc.BASE64Encoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -33,24 +29,30 @@ public final class DESEncryptor {
         byte[] loginId = clientLoginId.getBytes();
         try {
             SecretKey secretKey = new SecretKeySpec(password, "DES");
-            Cipher desCipher = Cipher.getInstance("DES");
+
+            // Create the cipher 
+            Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+
+            // Initialize the cipher for encryption
             desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            // Encrypt the text
             byte[] textEncrypted = desCipher.doFinal(loginId);
 
-            serverCheckSum = new String(textEncrypted, "UTF-8");
-            
+            BASE64Encoder encoder = new BASE64Encoder();
+            serverCheckSum = encoder.encode(textEncrypted);
+//            System.out.println("Text Encryted : " + serverCheckSum);
+
             textEncrypted = null;
             secretKey = null;
             desCipher = null;
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DESEncryptor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             //Logg INVALID DES KEY
             Logger.getLogger(DESEncryptor.class.getName()).log(Level.SEVERE, "Error while computing CheckSum! ", e);
             serverCheckSum = "CHECKSUM IS INVALID";
         }
         loginId = null;
-//        return serverCheckSum;
-        return clientLoginId;
+        return serverCheckSum;
+//        return clientLoginId;
     }
 }
