@@ -33,7 +33,7 @@ public class ConnectionStub implements Connection {
     }
     private final Server server;
     private BufferCharSequence _input = new BufferCharSequence();
-    private final ByteBufferFactory objByteBufferPool;
+    private final ByteBufferFactory objByteBufferPool;    
     private final AppendableBuffers _output;
     private final MessageCodec codec;
     private final Listener listener;
@@ -66,7 +66,7 @@ public class ConnectionStub implements Connection {
         this.codec = codec;
         this.listener = listener;
         this.server = server;
-        this.objByteBufferPool = new ByteBufferPool((((UnityIMPServer) server).getDEFAULT_BUFFER_SIZE()), false);
+        this.objByteBufferPool = new ByteBufferPool((((UnityIMPServer)server).getDEFAULT_BUFFER_SIZE()),false);
         this._output = new AppendableBuffers(this.objByteBufferPool);
     }
 
@@ -79,7 +79,7 @@ public class ConnectionStub implements Connection {
         this.server = server;
         this.registered = registered;
         this.loginIdOrServerName = servername;
-        this.objByteBufferPool = new ByteBufferPool((((UnityIMPServer) server).getDEFAULT_BUFFER_SIZE()), false);
+        this.objByteBufferPool = new ByteBufferPool((((UnityIMPServer)server).getDEFAULT_BUFFER_SIZE()),false);
         this._output = new AppendableBuffers(this.objByteBufferPool);
     }
 
@@ -261,7 +261,7 @@ public class ConnectionStub implements Connection {
                 Logger.getLogger(ConnectionStub.class.getName()).log(Level.SEVERE, "Marked to disconnect - Closing channel", iOException);
             }
         }
-
+        
         buffers = null;
         return finished;
     }

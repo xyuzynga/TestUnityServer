@@ -31,7 +31,7 @@ public class KempCodec {
             _input.clear();
             return dr.message;
         } catch (Exception ex) {
-            Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!{0}", ex);
+            Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!"+ ex);
             return null;
         } finally {
             objByteBufferPool.returnByteBuffer(_input);

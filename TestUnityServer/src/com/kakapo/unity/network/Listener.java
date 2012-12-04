@@ -33,7 +33,7 @@ public class Listener extends Thread {
         this.period = period;
         this.server = server;
         this._codec = server.getObjKempCodec().getMessageCodec();
-        this.objByteBufferPool = new ByteBufferPool(bufferSize, false);
+        this.objByteBufferPool = new ByteBufferPool(bufferSize,false);
         try {
             this.selector = Selector.open();
             channel = new ServerSocketChannel[ports.length];
@@ -109,7 +109,7 @@ public class Listener extends Thread {
             long now = System.currentTimeMillis();
             if (now - before > 10000) {
                 System.out.println();
-                logger.log(Level.WARNING, "***** totalMemory = {0} \t***** freeMemory = {1} *****", new Object[]{rt.totalMemory(), rt.freeMemory()});
+                logger.log(Level.WARNING, "\n***** totalMemory = {0} \t***** freeMemory = {1} *****", new Object[]{rt.totalMemory(), rt.freeMemory()});
                 before = now;
             }
         }

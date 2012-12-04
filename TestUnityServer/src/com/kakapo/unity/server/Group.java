@@ -42,7 +42,7 @@ public class Group {
         //TODO - GK <Done> Add Client
 
         ConnectedClient connectedClientWithSameLoginID = objConnectedClientHashMap.get(loginID);
-        if (connectedClientWithSameLoginID != null) {
+         if (connectedClientWithSameLoginID != null) {
             try {
                 connectedClientWithSameLoginID.receive(new OverrideMessage());
                 objConnectedClientHashMap.remove(loginID);
