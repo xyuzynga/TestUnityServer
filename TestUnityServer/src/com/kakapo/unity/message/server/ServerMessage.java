@@ -1,8 +1,9 @@
 package com.kakapo.unity.message.server;
 
 import com.kakapo.unity.message.Message;
+import org.jboss.netty.buffer.ChannelBuffer;
 
-public class ServerMessage extends Message {
+public abstract class ServerMessage extends Message {
 
     /**
      * Constructor for ServerMessage
@@ -22,4 +23,10 @@ public class ServerMessage extends Message {
     public ServerMessage(String command, boolean disconnect) {
         super(command, disconnect);
     }
+    
+    /**
+     *To ensure getEncodedMessage() is implemented in subclasses
+     * @return ChannelBuffer
+     */
+    public abstract ChannelBuffer getEncodedMessage();
 }

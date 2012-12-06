@@ -1,8 +1,8 @@
 package com.kakapo.unity.message;
 
-public abstract class Message {
+public abstract class Message implements MessagePattern {
 
-    private String _command;
+    private String _Command;
     private final boolean _disconnect;
 
     public Message(String command) {
@@ -10,14 +10,18 @@ public abstract class Message {
     }
 
     public Message(String command, boolean disconnect) {
-        this._command = command;
+        this._Command = command;
         this._disconnect = disconnect;
     }
 
+//    @Override
+//    public abstract String toString();
+    @Override
     public String getCommand() {
-        return this._command;
+        return this._Command;
     }
 
+    @Override
     public boolean isDisconnect() {
         return this._disconnect;
     }

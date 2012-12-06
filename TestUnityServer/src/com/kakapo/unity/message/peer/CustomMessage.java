@@ -1,10 +1,13 @@
 package com.kakapo.unity.message.peer;
 
 import java.util.Set;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.util.CharsetUtil;
 
 public class CustomMessage extends PeerMessage {
 
-    public final String COMMAND = "Custom";
+    public final String _Command = "Custom";
     private final CharSequence _text;
     private final CharSequence _dateTime;
     private int _length;
@@ -23,8 +26,8 @@ public class CustomMessage extends PeerMessage {
         this._length = length;
     }
 
-    public String getCOMMAND() {
-        return COMMAND;
+    public String get_Command() {
+        return _Command;
     }
 
     public CharSequence getText() {
@@ -37,5 +40,25 @@ public class CustomMessage extends PeerMessage {
 
     public int getLength() {
         return _length;
+    }
+
+    @Override
+    public ChannelBuffer getEncodedMessage() {
+        ChannelBuffer encodedMessage = ChannelBuffers.dynamicBuffer();
+        encodedMessage.writeBytes("Command: Custom\n".getBytes(CharsetUtil.UTF_8));
+        encodedMessage.writeBytes(("Id: " + super.getId() + "\n").getBytes(CharsetUtil.UTF_8));
+        encodedMessage.writeBytes(("Sender: " + super.getSender() + "\n").getBytes(CharsetUtil.UTF_8));
+        encodedMessage.writeBytes(("DateTime: " + _dateTime + "\n").getBytes(CharsetUtil.UTF_8));
+        StringBuilder builder = new StringBuilder();
+        for (String extension : super.getExtensions()) {
+            builder.append(extension);
+            builder.append(", ");
+        }
+        encodedMessage.writeBytes(("Extensions: " + builder + "\n").getBytes(CharsetUtil.UTF_8));
+        encodedMessage.writeBytes(("Length: " + _length + "\n").getBytes(CharsetUtil.UTF_8));
+        encodedMessage.writeBytes((_text + "\n").getBytes(CharsetUtil.UTF_8));
+        encodedMessage.writeBytes("\n".getBytes(CharsetUtil.UTF_8));
+        encodedMessage = encodedMessage.slice(0, encodedMessage.writerIndex());
+        return encodedMessage;
     }
 }

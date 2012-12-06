@@ -1,0 +1,4 @@
+Command: StatusList
+ExtensionStatus: DRDCommunications8006@drd.co.uk none
+ExtensionStatus: DRDCommunications8007@drd.co.uk none
+

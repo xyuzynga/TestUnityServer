@@ -32,6 +32,6 @@ public class ExtensionStatus {
 
     @Override
     public String toString() {
-        return "ExtensionStatus{" + "extension=" + extension + ", status=" + status + ", since=" + since + '}';
+        return "ExtensionStatus: " + extension + " " + status + "\n";
     }
 }

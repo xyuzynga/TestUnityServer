@@ -6,18 +6,21 @@ import com.kakapo.unity.network.BufferCharSequence;
 import com.kakapo.unity.network.ByteBufferFactory;
 import com.kakapo.unity.network.ByteBufferPool;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.util.CharsetUtil;
 
 public class KempCodec {
 
     private final MessageCodec messageCodec = new LegacyPatternCodec();
     private final ByteBufferFactory objByteBufferPool = new ByteBufferPool(512, true);
     private ByteBuffer _input = objByteBufferPool.getByteBuffer();
-    private final AppendableBuffers _output = new AppendableBuffers(objByteBufferPool);
+    private final AppendableBuffers _outputAppendableBuffer = new AppendableBuffers(objByteBufferPool);
     private final BufferCharSequence messageCharSequence = new BufferCharSequence();
 
-    
     public MessageCodec getMessageCodec() {
         return messageCodec;
     }
@@ -31,7 +34,7 @@ public class KempCodec {
             _input.clear();
             return dr.message;
         } catch (Exception ex) {
-            Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!"+ ex);
+            Logger.getLogger(KempCodec.class.getName()).log(Level.WARNING, "Could not KEMP decode given message!" + ex);
             return null;
         } finally {
             objByteBufferPool.returnByteBuffer(_input);
@@ -43,40 +46,44 @@ public class KempCodec {
         dr = messageCodec.decode(kempEncodedCharSeq);
         return dr.message;
     }
+/////////////////////////////////////// Encoding returns ByteBuffer[] ///////////////////////////////////////
 
     public ByteBuffer[] kemp1Encode(Message messageObj) throws Exception {
-        ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
-        return this._output.getBuffersForReading();
+        ((LegacyPatternCodec) this.messageCodec).encodeKemp1(messageObj, this._outputAppendableBuffer);
+        return this._outputAppendableBuffer.getBuffersForReading();
     }
 
+    public ByteBuffer[] kemp2Encode(Message messageObj) throws Exception {
+        ((LegacyPatternCodec) this.messageCodec).encodeKemp2(messageObj, this._outputAppendableBuffer);
+        return this._outputAppendableBuffer.getBuffersForReading();
+    }
+
+    public ByteBuffer[] serverEncode(Message messageObj) throws Exception {
+        ((LegacyPatternCodec) this.messageCodec).encodeServer(messageObj, this._outputAppendableBuffer);
+        return this._outputAppendableBuffer.getBuffersForReading();
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //************************************** Encoding returns ByteBuffer[] ***************************************   
     public ByteBuffer[] kemp1Encode(Message[] messageArrayObj) throws Exception {
         for (Message messageObj : messageArrayObj) {
-            ((LegacyPatternCodec)this.messageCodec).encodeKemp1(messageObj, this._output);
+            ((LegacyPatternCodec) this.messageCodec).encodeKemp1(messageObj, this._outputAppendableBuffer);
         }
-        return this._output.getBuffersForReading();
-    }
-    
-    public ByteBuffer[] kemp2Encode(Message messageObj) throws Exception {
-         ((LegacyPatternCodec)this.messageCodec).encodeKemp2(messageObj, this._output);
-        return this._output.getBuffersForReading();
+        return this._outputAppendableBuffer.getBuffersForReading();
     }
 
     public ByteBuffer[] kemp2Encode(Message[] messageArrayObj) throws Exception {
         for (Message messageObj : messageArrayObj) {
-            ((LegacyPatternCodec)this.messageCodec).encodeKemp2(messageObj, this._output);
+            ((LegacyPatternCodec) this.messageCodec).encodeKemp2(messageObj, this._outputAppendableBuffer);
         }
-        return this._output.getBuffersForReading();
+        return this._outputAppendableBuffer.getBuffersForReading();
     }
-    
-    public ByteBuffer[] serverEncode(Message messageObj) throws Exception {
-         ((LegacyPatternCodec)this.messageCodec).encodeServer(messageObj, this._output);
-        return this._output.getBuffersForReading();
-    }
-    
+
     public ByteBuffer[] serverEncode(Message[] messageArrayObj) throws Exception {
         for (Message messageObj : messageArrayObj) {
-            ((LegacyPatternCodec)this.messageCodec).encodeServer(messageObj, this._output);
+            ((LegacyPatternCodec) this.messageCodec).encodeServer(messageObj, this._outputAppendableBuffer);
         }
-        return this._output.getBuffersForReading();
+        return this._outputAppendableBuffer.getBuffersForReading();
     }
+//*************************************************************************************************************
 }

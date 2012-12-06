@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class ListScheduledStatusesMessage extends ClientMessage {
 
-    public final String COMMAND = "ListScheduledStatuses";
+    public final String _Command = "ListScheduledStatuses";
     private final String extension;
     private final Date start;
     private final Date end;

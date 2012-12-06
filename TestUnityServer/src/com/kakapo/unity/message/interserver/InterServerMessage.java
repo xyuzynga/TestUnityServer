@@ -1,8 +1,9 @@
 package com.kakapo.unity.message.interserver;
 
 import com.kakapo.unity.message.Message;
+import org.jboss.netty.buffer.ChannelBuffer;
 
-public class InterServerMessage extends Message {
+public abstract class InterServerMessage extends Message {
 
     /**
      * Constructor for InterServerMessage
@@ -22,4 +23,11 @@ public class InterServerMessage extends Message {
     public InterServerMessage(String command, boolean disconnect) {
         super(command, disconnect);
     }
+    
+    /**
+     *To ensure getEncodedMessage() is implemented in subclasses
+     * @return ChannelBuffer
+     */
+    public abstract ChannelBuffer getEncodedMessage();
+   
 }

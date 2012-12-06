@@ -2,6 +2,7 @@ package com.kakapo.unity.message.peer;
 
 import com.kakapo.unity.message.Message;
 import java.util.Set;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 public abstract class PeerMessage extends Message {
 
@@ -19,9 +20,6 @@ public abstract class PeerMessage extends Message {
     }
 
     public Set<String> getExtensions() {
-//        Set<String> copyOfExtensions = null;
-//        copyOfExtensions.addAll(this._extensions);
-//        return copyOfExtensions;
         return this._extensions;
     }
 
@@ -36,4 +34,10 @@ public abstract class PeerMessage extends Message {
     public CharSequence getSender() {
         return this._sender;
     }
+    
+    /**
+     *To ensure getEncodedMessage() is implemented in subclasses
+     * @return ChannelBuffer
+     */
+    public abstract ChannelBuffer getEncodedMessage();
 }

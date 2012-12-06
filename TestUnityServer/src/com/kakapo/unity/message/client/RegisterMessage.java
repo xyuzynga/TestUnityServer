@@ -2,32 +2,27 @@ package com.kakapo.unity.message.client;
 
 public class RegisterMessage extends ClientMessage {
 
-    public final String COMMAND = "Register";
-    private final CharSequence _extension;
-    private final CharSequence _group;
-    private final boolean _override;
+    public final String _Command = "Register";
+    private final CharSequence _Group;
+    private final CharSequence _Extension;
+    private final boolean _Override;
 
     public RegisterMessage(CharSequence group, CharSequence extension, boolean override) {
         super("Register");
-        this._group = group;
-        this._extension = extension;
-        this._override = override;
+        this._Group = group;
+        this._Extension = extension;
+        this._Override = override;
     }
 
     public CharSequence getExtension() {
-        return this._extension;
+        return this._Extension;
     }
 
     public CharSequence getGroup() {
-        return this._group;
+        return this._Group;
     }
 
     public boolean isOverride() {
-        return this._override;
-    }
-
-    @Override
-    public String toString() {
-        return "RegisterMessage{" + "COMMAND=" + COMMAND + ", _extension=" + _extension + ", _group=" + _group + ", _override=" + _override + '}';
+        return this._Override;
     }
 }

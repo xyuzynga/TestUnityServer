@@ -9,6 +9,7 @@ public class ContactAction {
     public ContactAction(Action action, String contact) {
         this._action = action;
         this._extension = contact;
+        this._product = null;
     }
 
     public ContactAction(Action action, String contact, String product) {
@@ -32,5 +33,22 @@ public class ContactAction {
     public enum Action {
 
         ADD, REMOVE;
+    }
+
+    @Override
+    public String toString() {
+        if ((this._product == null)||((this._product).contentEquals("none"))) {
+            if (_action == Action.ADD) {
+                return ("Add-Contact: " + _extension + "\n");
+            } else {
+                return ("Remove-Contact: " + _extension + "\n");
+            }
+        } else {
+            if (_action == Action.ADD) {
+                return ("Add-Contact: " + _extension + " " + _product + "\n");
+            } else {
+                return ("Remove-Contact: " + _extension + " " + _product + "\n");
+            }
+        }
     }
 }

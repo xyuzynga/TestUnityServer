@@ -2,10 +2,11 @@ package com.kakapo.unity.message.client;
 
 import com.kakapo.unity.message.ScheduledStatus;
 import java.util.Date;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 public class AddScheduledStatusMessage extends ClientMessage {
 
-    public final String COMMAND = "AddScheduledStatus";
+    public final String _Command = "AddScheduledStatus";
     private final ScheduledStatus scheduledStatus;
     private final String extension;
 

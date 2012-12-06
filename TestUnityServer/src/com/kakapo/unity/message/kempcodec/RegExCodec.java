@@ -306,7 +306,7 @@ public class RegExCodec implements MessageCodec {
                                         } else {
                                             _matcher = ServerContactList.matcher(messageFromClientOrServer);
                                             if (_matcher.find()) {
-                                                Logger.getLogger(this.getClass().toString()).log(Level.FINEST, "Matcher {0}",(_matcher.group(3)));
+                                                Logger.getLogger(this.getClass().toString()).log(Level.FINEST, "Matcher {0}", (_matcher.group(3)));
                                                 ContactAction action = new ContactAction("Add".contentEquals(_matcher.group(2)) ? ContactAction.Action.ADD : ContactAction.Action.REMOVE, _matcher.group(3));
                                                 decodedMessageObj = new ServerContactList(_matcher.group(1), action);
                                             } else {
